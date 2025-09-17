@@ -176,8 +176,8 @@
     </div>
 </main>
 
-<footer class="main-footer" style="background:#0f172a;">
-    <div class="container py-1" style="background:transparent!important;box-shadow:none!important;border-radius:0!important;">
+<footer class="main-footer">
+    <div class="container py-1">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
 
             {# gauche : logo + marque + année #}
@@ -210,12 +210,13 @@
 {# Petites variables JS #}
 
 <script>
-    window.HELP_KB_URL = '{{ path('app_contact', {'_locale': app.request.locale}) }}';
+    <body data-help-kb-url="{{ path('app_contact', {'_locale': app.request.locale}) }}">
+
 </script>
 
 
 {% include '_partials/help_widget.html.twig' %}
-<script src="{{ asset('js/menu.js') }}" defer></script>
+
 
 
 </body>
