@@ -351,83 +351,22 @@
         const panel  = document.getElementById('ocMenuPanel');
         if (!toggle || !panel) return;
 
-        // A11y de base
-        toggle.setAttribute('aria-controls', panel.id);
-        toggle.setAttribute('aria-expanded', 'false');
-        panel.setAttribute('role', 'menu'); // optionnel
-        panel.setAttribute('aria-hidden', 'true');
+        const open  = () => { panel.hidden = false;  toggle.setAttribute('aria-expanded', 'true');  };
+        const close = () => { panel.hidden = true;   toggle.setAttribute('aria-expanded', 'false'); };
 
-        const KEY = 'oc_menu_open';
-        let previouslyFocused = null;
-
-        const focusableSelectors =
-            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-        const firstFocusable = () => panel.querySelector(focusableSelectors);
-        const allFocusable   = () => Array.from(panel.querySelectorAll(focusableSelectors));
-
-        const open = ({ skipFocus = false } = {}) => {
-            previouslyFocused = document.activeElement;
-            panel.hidden = false;
-            panel.setAttribute('aria-hidden', 'false');
-            toggle.setAttribute('aria-expanded', 'true');
-            localStorage.setItem(KEY, '1');
-            if (!skipFocus) (firstFocusable() || panel).focus({ preventScroll: true });
-        };
-
-        const close = () => {
-            panel.hidden = true;
-            panel.setAttribute('aria-hidden', 'true');
-            toggle.setAttribute('aria-expanded', 'false');
-            localStorage.setItem(KEY, '0');
-            if (previouslyFocused) previouslyFocused.focus({ preventScroll: true });
-        };
-
-        // Restaure l'état (ouvert/fermé) au chargement
-        if (localStorage.getItem(KEY) === '1') {
-            open({ skipFocus: true }); // on évite de voler le focus au chargement
-        }
-
-        // Toggle par clic sur le bouton
         toggle.addEventListener('click', (e) => {
             e.preventDefault();
             panel.hidden ? open() : close();
         });
 
-        // Ferme si clic en dehors
         document.addEventListener('click', (e) => {
             if (panel.hidden) return;
             if (!panel.contains(e.target) && !toggle.contains(e.target)) close();
         });
 
-        // Échap pour fermer + petit focus trap
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') close();
-
-            if (!panel.hidden && e.key === 'Tab') {
-                const focusables = allFocusable();
-                if (!focusables.length) return;
-                const first = focusables[0];
-                const last  = focusables[focusables.length - 1];
-
-                if (e.shiftKey && document.activeElement === first) {
-                    e.preventDefault(); last.focus();
-                } else if (!e.shiftKey && document.activeElement === last) {
-                    e.preventDefault(); first.focus();
-                }
-            }
         });
-
-        // Ferme après clic sur un lien du panneau
-        panel.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
-
-        // Ferme en scroll descendant > 40px
-        let lastY = window.scrollY || 0;
-        window.addEventListener('scroll', () => {
-            const y = window.scrollY || 0;
-            if (!panel.hidden && y - lastY > 40) close();
-            lastY = y;
-        }, { passive: true });
     });
 </script>
 
