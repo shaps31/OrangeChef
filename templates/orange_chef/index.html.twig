@@ -64,29 +64,32 @@
 
             <div class="teaser-grid">
                 {% for r in latestRecipes %}
+                    {# Fallbacks simples + lisibles #}
+                    {% set title = r.title ?? r.titre ?? 'Recette' %}
+                    {% set desc  = (r.description ?? r.resume ?? '')|striptags|u.truncate(110, '…') %}
+                    {% set img   = r.image ? ('/uploads/recipes/' ~ r.image) : 'assets/img/placeholder-recipe.jpg' %}
+
                     <article class="teaser-card">
-                        <a href="{{ path('app_recipe_show', { id: r.id }) }}" class="teaser-thumb" aria-label="{{ r.titre ?? r.title }}">
-                            {{ media.image(
-                                r.image ? ('/uploads/recipes/' ~ r.image) : 'assets/img/placeholder-recipe.jpg',
-                            r.titre ?? r.title,
-                            'card',
-                            480, 320,
-                            'card-img-top rounded'
-                            ) }}
+                        <a href="{{ path('app_recipe_show', { id: r.id }) }}"
+                           class="teaser-thumb"
+                           aria-label="{{ title }}">
+                            {{ media.image(img, title, 'card', 480, 320, 'card-img-top rounded') }}
                         </a>
 
                         <div class="teaser-content">
                             <h3 class="teaser-title">
-                                <a href="{{ path('app_recipe_show', { id: r.id }) }}">{{ r.titre ?? r.title }}</a>
+                                <a href="{{ path('app_recipe_show', { id: r.id }) }}">{{ title }}</a>
                             </h3>
-                            <p class="teaser-excerpt">
-                                {{ (r.resume ?? r.description ?? '')|striptags|u.truncate(110, '…') }}
-                            </p>
+                            <p class="teaser-excerpt">{{ desc }}</p>
                         </div>
                     </article>
                 {% else %}
-                    <p class="muted">Aucune recette pour le moment. <a href="{{ path('app_my_recipes') }}">Ajoute la première</a> 🍊</p>
+                    <p class="muted">
+                        Aucune recette pour le moment.
+                        <a href="{{ path('app_my_recipes') }}">Ajoute la première</a> 🍊
+                    </p>
                 {% endfor %}
+
             </div>
 
             <div class="preview-actions">
