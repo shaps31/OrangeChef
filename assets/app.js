@@ -146,3 +146,25 @@ document.addEventListener('DOMContentLoaded', () => {
     initProfilePreview();
     initHeaderMenuToggle();
 });
+
+// Inventaire: filtres "Toutes / OK / Bientôt périmées / Périmées"
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.querySelector('[data-inventory]');
+    if (!root) return;
+
+    const tabs = root.querySelectorAll('.tab');
+    const rows = root.querySelectorAll('tbody tr');
+
+    function apply(filter) {
+        rows.forEach(r => {
+            const st = r.getAttribute('data-status');
+            r.style.display = (filter === 'all' || filter === st) ? '' : 'none';
+        });
+    }
+
+    tabs.forEach(btn => btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        apply(btn.dataset.filter);
+    }));
+});

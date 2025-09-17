@@ -3,163 +3,101 @@
 {% block title %}Mon inventaire d'oranges{% endblock %}
 
 {% block body %}
-<div class="container">
-  <div class="inventory-header">
-    <h1>🍊 Mon inventaire</h1>
-    <a class="btn" href="{{ path('app_inventory_new') }}">➕ Ajouter du stock</a>
-  </div>
+    <div class="container" data-inventory>
+        <div class="inventory-header">
+            <h1>🍊 Mon inventaire</h1>
+            <a class="btn" href="{{ path('app_inventory_new') }}">➕ Ajouter du stock</a>
+        </div>
 
-  <section class="stats-cards">
-    <div class="stat-card">
-      <div class="stat-icon">🟠</div>
-      <div class="stat-content"><span>Total</span><strong>{{ stats.total }}</strong></div>
-    </div>
-    <div class="stat-card warn">
-      <div class="stat-icon">⏳</div>
-      <div class="stat-content"><span>Bientôt périmées</span><strong>{{ stats.expiringSoon }}</strong></div>
-    </div>
-    <div class="stat-card bad">
-      <div class="stat-icon">⛔</div>
-      <div class="stat-content"><span>Périmées</span><strong>{{ stats.expired }}</strong></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">🌱</div>
-      <div class="stat-content"><span>Variétés</span><strong>{{ stats.varieties }}</strong></div>
-    </div>
-  </section>
-
-  <div class="table-tools">
-    <div class="tabs" role="tablist">
-      <button class="tab is-active" data-filter="all" aria-selected="true">Toutes</button>
-      <button class="tab" data-filter="ok">OK</button>
-      <button class="tab" data-filter="soon">Bientôt périmées</button>
-      <button class="tab" data-filter="expired">Périmées</button>
-    </div>
-  </div>
-
-  {% if inventory is empty %}
-    <div class="empty-state">
-      <h3>Aucun stock pour le moment</h3>
-      <p>Ajoutez vos oranges pour suivre les dates limites et éviter le gaspillage.</p>
-      <a class="btn" href="{{ path('app_inventory_new') }}">Ajouter mes premières oranges</a>
-    </div>
-  {% else %}
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Variété</th>
-            <th>Quantité</th>
-            <th>Expiration</th>
-            <th>État</th>
-            <th class="actions-col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in inventory %}
-            {% set status = item.isExpired() ? 'expired' : (item.isExpiringSoon() ? 'soon' : 'ok') %}
-            <tr data-status="{{ status }}">
-              <td>{{ item.variety }}</td>
-              <td>{{ item.quantity }}</td>
-              <td>{{ item.expirationDate ? item.expirationDate|date('d/m/Y') : '-' }}</td>
-              <td>
-                {% if status == 'expired' %}
-                  <span class="badge bad">Périmé</span>
-                {% elseif status == 'soon' %}
-                  <span class="badge warn">Bientôt périmé</span>
-                {% else %}
-                  <span class="badge ok">OK</span>
-                {% endif %}
-              </td>
-              <td class="row-actions">
-                <a class="btn btn-small" href="{{ path('app_inventory_show', {id: item.id}) }}">👀 Voir</a>
-                <a class="btn btn-secondary btn-small" href="{{ path('app_inventory_edit', {id: item.id}) }}">✏️ Modifier</a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% endif %}
-
-  <div class="suggestions">
-    <h2>🍽️ Suggestions de recettes</h2>
-    {% if suggestions is empty %}
-      <p class="muted">Aucune suggestion pour le moment.</p>
-    {% else %}
-      <div class="recipes-grid">
-        {% for recipe in suggestions %}
-          <div class="recipe-card mini">
-            <div class="recipe-content">
-              <h3>{{ recipe.title ?? ('Recette #' ~ recipe.id) }}</h3>
-              <a class="btn btn-secondary btn-small" href="{{ path('app_recipe_show', {id: recipe.id}) }}">Voir</a>
+        <section class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-icon">🟠</div>
+                <div class="stat-content"><span>Total</span><strong>{{ stats.total }}</strong></div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  </div>
-</div>
+            <div class="stat-card warn">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content"><span>Bientôt périmées</span><strong>{{ stats.expiringSoon }}</strong></div>
+            </div>
+            <div class="stat-card bad">
+                <div class="stat-icon">⛔</div>
+                <div class="stat-content"><span>Périmées</span><strong>{{ stats.expired }}</strong></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🌱</div>
+                <div class="stat-content"><span>Variétés</span><strong>{{ stats.varieties }}</strong></div>
+            </div>
+        </section>
 
-<style>
-.inventory-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; }
-.stats-cards { display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin:10px 0 18px; }
-.stat-card { background:#fff; border-radius:12px; padding:12px; display:flex; gap:10px; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,.06); }
-.stat-card .stat-icon { font-size:22px; }
-.stat-card .stat-content span { display:block; color:#777; font-size:12px; }
-.stat-card .stat-content strong { font-size:18px; color:#333; }
-.stat-card.warn { border:1px solid #ffe0b2; background:#fffaf2; }
-.stat-card.bad { border:1px solid #ffcdd2; background:#fff5f5; }
+        <div class="table-tools">
+            <div class="tabs" role="tablist">
+                <button class="tab is-active" data-filter="all" aria-selected="true">Toutes</button>
+                <button class="tab" data-filter="ok">OK</button>
+                <button class="tab" data-filter="soon">Bientôt périmées</button>
+                <button class="tab" data-filter="expired">Périmées</button>
+            </div>
+        </div>
 
-.table-tools { display:flex; justify-content:flex-end; margin-bottom:8px; }
-.tabs { display:flex; gap:8px; }
-.tab { background:#fff; border:1px solid #eee; padding:6px 10px; border-radius:999px; font-size:13px; cursor:pointer; }
-.tab.is-active { border-color:#ff9800; color:#ff9800; background:#fffaf2; }
+        {% if inventory is empty %}
+            <div class="empty-state">
+                <h3>Aucun stock pour le moment</h3>
+                <p>Ajoutez vos oranges pour suivre les dates limites et éviter le gaspillage.</p>
+                <a class="btn" href="{{ path('app_inventory_new') }}">Ajouter mes premières oranges</a>
+            </div>
+        {% else %}
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Variété</th>
+                        <th>Quantité</th>
+                        <th>Expiration</th>
+                        <th>État</th>
+                        <th class="actions-col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in inventory %}
+                        {% set status = item.isExpired() ? 'expired' : (item.isExpiringSoon() ? 'soon' : 'ok') %}
+                        <tr data-status="{{ status }}">
+                            <td>{{ item.variety }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.expirationDate ? item.expirationDate|date('d/m/Y') : '-' }}</td>
+                            <td>
+                                {% if status == 'expired' %}
+                                    <span class="badge badge-bad">Périmé</span>
+                                {% elseif status == 'soon' %}
+                                    <span class="badge badge-warn">Bientôt périmé</span>
+                                {% else %}
+                                    <span class="badge badge-ok">OK</span>
+                                {% endif %}
+                            </td>
+                            <td class="row-actions">
+                                <a class="btn btn-small" href="{{ path('app_inventory_show', {id: item.id}) }}">👀 Voir</a>
+                                <a class="btn btn-secondary btn-small" href="{{ path('app_inventory_edit', {id: item.id}) }}">✏️ Modifier</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
 
-.table-wrap { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06); overflow:hidden; }
-.table { width:100%; border-collapse: collapse; }
-.table th, .table td { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; }
-.table thead th { background:#fffaf2; color:#a66a00; text-align:left; font-weight:600; }
-.actions-col { width: 170px; }
-
-.badge { padding: 3px 10px; border-radius: 999px; font-size: 12px; }
-.badge.ok { background:#e8f5e9; color:#2e7d32; }
-.badge.warn { background:#fff3e0; color:#f57c00; }
-.badge.bad { background:#ffebee; color:#c62828; }
-
-.row-actions { display:flex; gap:8px; }
-.btn { background: linear-gradient(135deg, #ff9800, #f57c00); color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; }
-.btn-secondary { background:#fff; color:#ff9800; border:2px solid #ff9800; }
-.btn-secondary:hover { background:#ff9800; color:#fff; }
-.btn-small { padding:6px 10px; font-size:13px; }
-
-.empty-state { text-align:center; background:#fff; padding:30px 16px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
-.muted { color:#777; }
-
-.recipes-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:12px; margin-top:8px; }
-.recipe-card.mini { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.06); padding:12px; }
-.recipe-card .recipe-content h3 { margin:0 0 8px; font-size:1rem; }
-
-@media (max-width: 800px) { .stats-cards { grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 520px) { .stats-cards { grid-template-columns: 1fr; } .actions-col { width:auto; } }
-</style>
-
-<script>
-  (function(){
-    const root = document.currentScript.closest('.container');
-    const tabs = root.querySelectorAll('.tab');
-    const rows = root.querySelectorAll('tbody tr');
-    function apply(filter){
-      rows.forEach(r => {
-        const st = r.getAttribute('data-status');
-        r.style.display = (filter === 'all' || filter === st) ? '' : 'none';
-      });
-    }
-    tabs.forEach(btn => btn.addEventListener('click', () => {
-      tabs.forEach(b=>b.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      apply(btn.dataset.filter);
-    }));
-  })();
-</script>
+        <div class="suggestions">
+            <h2>🍽️ Suggestions de recettes</h2>
+            {% if suggestions is empty %}
+                <p class="muted">Aucune suggestion pour le moment.</p>
+            {% else %}
+                <div class="recipes-grid">
+                    {% for recipe in suggestions %}
+                        <div class="recipe-card mini">
+                            <div class="recipe-content">
+                                <h3>{{ recipe.title ?? ('Recette #' ~ recipe.id) }}</h3>
+                                <a class="btn btn-secondary btn-small" href="{{ path('app_recipe_show', {id: recipe.id}) }}">Voir</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

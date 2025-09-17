@@ -51,9 +51,12 @@ body{
     line-height:1.65;
     color:var(--oc-text);
     background:
-        radial-gradient(120px 120px at 18% 8%, rgba(255,155,60,.20) 0 80%, transparent 80%),
-        radial-gradient(180px 180px at 82% 28%, rgba(255,120,0,.14) 0 75%, transparent 75%),
+        radial-gradient(120px 120px at 18% 8%,
+        rgba(255,155,60,0.2) 0%, rgba(255,155,60,0.2) 80%, rgba(0,0,0,0) 80%),
+        radial-gradient(180px 180px at 82% 28%,
+        rgba(255,120,0,0.14) 0%, rgba(255,120,0,0.14) 75%, rgba(0,0,0,0) 75%),
         linear-gradient(135deg, var(--oc-bg-grad-1) 0%, var(--oc-bg-grad-2) 100%);
+
     min-height:100vh;
     display:flex; flex-direction:column;
     animation:fadeIn .6s ease-out;
@@ -321,6 +324,24 @@ body{
 .shadow{box-shadow:var(--oc-shadow)}
 .surface{background:var(--oc-surface)}
 .surface-2{background:var(--oc-surface-2)}
+
+/* ——— Recettes : meta en ligne + étoiles compactes ——— */
+.rc-meta{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.rc-item{ display:flex; align-items:center; gap:6px; line-height:1; }
+
+.rc-stars{
+    display:inline-flex;
+    gap:2px;
+    white-space:nowrap;
+    line-height:1;
+    vertical-align:middle;
+    font-size:14px;
+}
+.rc-stars .off{ opacity:.35; }
+
+/* au cas où l’ancien CSS mettait les items en grid */
+.rc-meta .rc-item, .recipe-card .meta .meta-item { display:flex; }
+
 
 /* === Badges === */
 .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;animation:badgeGlow 2s ease-in-out infinite alternate}
@@ -1616,5 +1637,89 @@ body{
     .form-row{ flex-direction:column; gap:0; }
     .form-group.half, .form-group.third{ flex:1; }
     .form-section{ padding:20px; }
+
+
+.filters-form .filter-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px}
+    .filters-form .filter-group{display:flex;align-items:center;gap:8px}
+    .filters-form .search-input{min-width:220px}
+
+    .recipes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:25px}
+    .recipe-card{background:#fff;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.1);transition:.3s cubic-bezier(.4,0,.2,1)}
+    .recipe-card:hover{transform:translateY(-8px);box-shadow:0 12px 30px rgba(0,0,0,.15)}
+    .recipe-image{height:200px;position:relative;overflow:hidden}
+    .recipe-image img{width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+    .recipe-card:hover .recipe-image img{transform:scale(1.05)}
+    .recipe-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,#ff9800,#f57c00);font-size:4em;color:#fff}
+    .recipe-badges{position:absolute;top:10px;right:10px;display:flex;gap:5px}
+
+    .recipe-content{padding:20px}
+    .recipe-description{color:#666;font-size:14px;margin-bottom:15px;line-height:1.4}
+
+    /* —— meta compacte + étoiles qui ne cassent pas —— */
+    .rc-meta{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px;font-size:13px}
+    .rc-stats{display:flex;gap:15px;color:#666;flex-wrap:wrap}
+    .rc-item{display:flex;align-items:center;gap:6px;white-space:nowrap}
+    .rc-stars{display:inline-flex;gap:2px;white-space:nowrap;line-height:1;vertical-align:middle;font-size:14px;color:#ff9800}
+    .rc-stars .off{opacity:.35}
+    .no-rating{color:#6b7280;white-space:nowrap}
+
+    .recipe-actions{display:flex;gap:8px;margin-top:8px}
+    .btn{background:linear-gradient(135deg,#ff9800,#f57c00);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none}
+    .btn-secondary{background:#fff;color:#ff9800;border:2px solid #ff9800}
+    .btn-secondary:hover{background:#ff9800;color:#fff}
+    .btn-small{padding:6px 10px;font-size:13px}
+
+    @media (max-width:768px){
+        .recipes-grid{grid-template-columns:1fr}
+        .filter-row{flex-direction:column}
+        .filter-group{width:100%}
+    }
+
+    /* pagination (inchangé) */
+    .pagination{display:flex;align-items:center;justify-content:center;gap:12px;margin:28px 0;flex-wrap:wrap}
+    .page-numbers{display:flex;gap:8px}
+    .page-btn,.page-numbers .page{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 14px;border-radius:10px;border:1px solid #ffe3c6;background:#fff;text-decoration:none;color:#1f2937;font-weight:600;box-shadow:0 1px 0 rgba(16,24,40,.06);transition:transform .12s,box-shadow .12s,background .12s,border-color .12s}
+    .page-btn:hover,.page-numbers .page:hover{transform:translateY(-1px);border-color:#ffc78f;background:#fffdf9;box-shadow:0 6px 16px rgba(255,152,0,.12)}
+    .page-numbers .current{background:#fff3e0;border-color:#ff9800;color:#1f2937;font-weight:800;cursor:default;box-shadow:inset 0 1px 0 rgba(255,152,0,.15),0 6px 14px rgba(255,152,0,.10)}
+    .page-btn.is-disabled,[aria-disabled="true"]{opacity:.45;pointer-events:none}
+    .dots{padding:0 6px;color:#9aa3b2;user-select:none}
+    .page-summary{text-align:center;margin:4px 0 0;color:#6b7280;font-size:.9rem}
 }
 
+/* === INVENTORY =================================================== */
+.inventory-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.stats-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0 18px}
+.stat-card{background:#fff;border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.stat-card .stat-icon{font-size:22px}
+.stat-card .stat-content span{display:block;color:#777;font-size:12px}
+.stat-card .stat-content strong{font-size:18px;color:#333}
+.stat-card.warn{border:1px solid #ffe0b2;background:#fffaf2}
+.stat-card.bad{border:1px solid #ffcdd2;background:#fff5f5}
+
+.table-tools{display:flex;justify-content:flex-end;margin-bottom:8px}
+.tabs{display:flex;gap:8px}
+.tab{background:#fff;border:1px solid #eee;padding:6px 10px;border-radius:999px;font-size:13px;cursor:pointer}
+.tab.is-active{border-color:#ff9800;color:#ff9800;background:#fffaf2}
+
+.table-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:10px 12px;border-bottom:1px solid #f1f1f1}
+.table thead th{background:#fffaf2;color:#a66a00;text-align:left;font-weight:600}
+.actions-col{width:170px}
+
+.badge{padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.badge-ok{background:linear-gradient(180deg,#FFF7EB,#FFF1E0);color:var(--oc-success-ink,#7a4a00);border:1px solid rgba(255,152,0,.35)}
+.badge-warn{background:#fff3e0;color:#f57c00}
+.badge-bad{background:#ffebee;color:#c62828}
+
+.row-actions{display:flex;gap:8px}
+
+.empty-state{text-align:center;background:#fff;padding:30px 16px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.muted{color:#777}
+
+.recipes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:8px}
+.recipe-card.mini{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:12px}
+.recipe-card .recipe-content h3{margin:0 0 8px;font-size:1rem}
+
+@media (max-width: 800px){.stats-cards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width: 520px){.stats-cards{grid-template-columns:1fr}.actions-col{width:auto}}
