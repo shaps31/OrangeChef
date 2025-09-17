@@ -7,44 +7,43 @@
  */
 
 
-
-console.log('✅ assets/app.js chargé — Bienvenue dans AssetMapper !');
-
 /* --------------------------------------------------------------------------
    1) Prévisualisation d’image sur les <input type="file">
    - Ajoute une <img> juste après chaque input fichier
    - Affiche l’aperçu dès qu’un fichier image est choisi
 --------------------------------------------------------------------------- */
 function initImagePreviews() {
-    const inputs = document.querySelectorAll('input[type="file"]');
-    if (!inputs.length) return;
+    document.addEventListener("DOMContentLoaded", () => {
+        const input = document.querySelector('input[type="file"][name$="[avatar]"]');
+        if (!input) return;
 
-    inputs.forEach((input) => {
-        // Image de preview (créée une seule fois)
-        const preview = document.createElement('img');
-        preview.style.maxWidth = '120px';
-        preview.style.marginTop = '10px';
-        preview.style.display = 'block';
-        input.insertAdjacentElement('afterend', preview);
+        let preview = input.parentElement.querySelector('.upload-preview');
+        if (!preview) {
+            preview = document.createElement("img");
+            preview.className = "upload-preview";
+            input.parentElement.appendChild(preview);
+        }
 
-        input.addEventListener('change', () => {
+        input.addEventListener("change", () => {
             const file = input.files?.[0];
-            if (!file || !file.type?.startsWith('image/')) {
+            if (file && file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
                 preview.removeAttribute('src');
-                return;
             }
-            const reader = new FileReader();
-            reader.onload = (e) => (preview.src = e.target?.result || '');
-            reader.readAsDataURL(file);
         });
     });
 }
 
-/* --------------------------------------------------------------------------
-   2) Aperçu "live" d’un formulaire de profil (facultatif)
-   - Met à jour des badges/labels en même temps que l’utilisateur tape
-   - S’active uniquement si on trouve des éléments #pvName/#pvEmail/...
---------------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------------
+       2) Aperçu "live" d’un formulaire de profil (facultatif)
+       - Met à jour des badges/labels en même temps que l’utilisateur tape
+       - S’active uniquement si on trouve des éléments #pvName/#pvEmail/...
+    --------------------------------------------------------------------------- */
 function initProfilePreview() {
     const form = document.querySelector('form');
     // On ne fait rien si pas de form ou si aucun bloc de preview

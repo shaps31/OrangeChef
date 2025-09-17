@@ -368,6 +368,7 @@ body{
     .search-form{flex-direction:column;gap:8px}
     .search-input{width:100%}
 }
+.upload-preview{ max-width:100px; margin-top:10px; border-radius:8px }
 
 /* ======= TITRES DE SECTION ======= */
 .section-title{
