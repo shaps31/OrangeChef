@@ -218,26 +218,76 @@
     </div>
 
     {% if total_pages > 1 %}
-      <nav class="pagination">
-        <a class="page-btn" href="{{ path('app_recipe_index', {
-          p: page > 1 ? page - 1 : 1,
-          ps: page_size,
-          sort: sort,
-          category: current_category,
-          difficulty: current_difficulty,
-          search: current_search
-        }) }}" aria-disabled="{{ page == 1 ? 'true' : 'false' }}">⟵ Précédent</a>
-        <span class="page-info">Page {{ page }} / {{ total_pages }} ({{ total }} résultats)</span>
-        <a class="page-btn" href="{{ path('app_recipe_index', {
-          p: page < total_pages ? page + 1 : total_pages,
-          ps: page_size,
-          sort: sort,
-          category: current_category,
-          difficulty: current_difficulty,
-          search: current_search
-        }) }}" aria-disabled="{{ page == total_pages ? 'true' : 'false' }}">Suivant ⟶</a>
-      </nav>
+        {# fenêtre de 5 pages : [page-2 … page+2] #}
+        {% set window = 2 %}
+        {% set start = page - window %}
+        {% set end   = page + window %}
+        {% set start = start < 1 ? 1 : start %}
+        {% set end   = end > total_pages ? total_pages : end %}
+
+        <nav class="pagination" role="navigation" aria-label="Pagination">
+            {# Précédent #}
+            <a class="page-btn prev {{ page == 1 ? 'is-disabled' : '' }}"
+               href="{{ path('app_recipe_index', {
+                   _locale: app.request.locale,
+                   p: page > 1 ? page - 1 : 1,
+                   ps: page_size,
+                   sort: sort,
+                   category: current_category,
+                   difficulty: current_difficulty,
+                   search: current_search
+               }) }}"
+               aria-disabled="{{ page == 1 ? 'true' : 'false' }}">⟵ Précédent</a>
+
+            <div class="page-numbers">
+                {# Début + ellipsis #}
+                {% if start > 1 %}
+                    <a class="page" href="{{ path('app_recipe_index', {
+                        _locale: app.request.locale, p: 1, ps: page_size, sort: sort,
+                        category: current_category, difficulty: current_difficulty, search: current_search
+                    }) }}">1</a>
+                    {% if start > 2 %}<span class="dots">…</span>{% endif %}
+                {% endif %}
+
+                {# Fenêtre #}
+                {% for pnum in start..end %}
+                    {% if pnum == page %}
+                        <span class="page current" aria-current="page">{{ pnum }}</span>
+                    {% else %}
+                        <a class="page" href="{{ path('app_recipe_index', {
+                            _locale: app.request.locale, p: pnum, ps: page_size, sort: sort,
+                            category: current_category, difficulty: current_difficulty, search: current_search
+                        }) }}">{{ pnum }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {# Fin + ellipsis #}
+                {% if end < total_pages %}
+                    {% if end < total_pages - 1 %}<span class="dots">…</span>{% endif %}
+                    <a class="page" href="{{ path('app_recipe_index', {
+                        _locale: app.request.locale, p: total_pages, ps: page_size, sort: sort,
+                        category: current_category, difficulty: current_difficulty, search: current_search
+                    }) }}">{{ total_pages }}</a>
+                {% endif %}
+            </div>
+
+            {# Suivant #}
+            <a class="page-btn next {{ page == total_pages ? 'is-disabled' : '' }}"
+               href="{{ path('app_recipe_index', {
+                   _locale: app.request.locale,
+                   p: page < total_pages ? page + 1 : total_pages,
+                   ps: page_size,
+                   sort: sort,
+                   category: current_category,
+                   difficulty: current_difficulty,
+                   search: current_search
+               }) }}"
+               aria-disabled="{{ page == total_pages ? 'true' : 'false' }}">Suivant ⟶</a>
+        </nav>
+
+        <p class="page-summary">Page {{ page }} / {{ total_pages }} — {{ total }} résultats</p>
     {% endif %}
+
 </div>
 
 <style>
@@ -430,7 +480,45 @@
     }
 }
 </style>
-<script>
+
+    <style>
+        .pagination{
+            display:flex; align-items:center; justify-content:center; gap:12px;
+            margin:28px 0; flex-wrap:wrap;
+        }
+        .page-numbers{ display:flex; gap:8px; }
+
+        .page-btn, .page-numbers .page{
+            display:inline-flex; align-items:center; justify-content:center;
+            min-width:40px; height:40px; padding:0 14px;
+            border-radius:10px; border:1px solid #ffe3c6; background:#fff;
+            text-decoration:none; color:#1f2937; font-weight:600;
+            box-shadow:0 1px 0 rgba(16,24,40,.06);
+            transition: transform .12s ease, box-shadow .12s ease,
+            background .12s ease, border-color .12s ease;
+        }
+        .page-btn:hover, .page-numbers .page:hover{
+            transform: translateY(-1px);
+            border-color:#ffc78f; background:#fffdf9;
+            box-shadow:0 6px 16px rgba(255,152,0,.12);
+        }
+        .page-numbers .current{
+            background:#fff3e0; border-color:#ff9800; color:#1f2937;
+            font-weight:800; cursor:default;
+            box-shadow: inset 0 1px 0 rgba(255,152,0,.15), 0 6px 14px rgba(255,152,0,.10);
+        }
+        .page-btn.is-disabled, .page-btn[aria-disabled="true"]{
+            opacity:.45; pointer-events:none; cursor:not-allowed;
+        }
+        .dots{ padding:0 6px; color:#9aa3b2; user-select:none; }
+        .page-summary{ text-align:center; margin:4px 0 0; color:#6b7280; font-size:.9rem; }
+
+        @media (max-width:560px){
+            .page-btn{ min-width:36px; height:36px; padding:0 10px }
+        }
+    </style>
+
+    <script>
   (function(){
     const container = document.currentScript.closest('.container');
     const densityBtn = container.querySelector('#densityToggle');

@@ -5,8 +5,7 @@
     window.OC_ROUTE_MAP = {
         'route:app_recipe_index': '{{ path("app_recipe_index", {"_locale": app.request.locale}) }}',
         'route:app_recipe_new': '{{ path("app_recipe_new", {"_locale": app.request.locale}) }}',
-        'route:app_my_recipes': '{{ path("app_my_recipes", {"_locale": app.request.locale}) }}',
-        'route:app_friends': '{{ path("app_friends", {"_locale": app.request.locale}) }}',
+        'route:app_my_recipes': '{{ path("app_my_recipes", {"_locale": app.request.locale}) }}'
         'route:app_inventory_index': '{{ path("app_inventory_index", {"_locale": app.request.locale}) }}',
         'route:app_inventory_new': '{{ path("app_inventory_new", {"_locale": app.request.locale}) }}',
         'route:app_inventory_alerts': '{{ path("app_inventory_alerts", {"_locale": app.request.locale}) }}',
@@ -84,7 +83,7 @@
     </div>
 
     <div class="oc-help-body">
-        <p id="ocHelpDesc" class="oc-help-desc">Tapez un mot-clé (ex : « recette », « amis », « contact ») ou filtrez par catégorie.</p>
+        <p id="ocHelpDesc" class="oc-help-desc">Tapez un mot-clé (ex : « recette » ou filtrez par catégorie.</p>
         <div class="oc-help-search">
             <input id="ocHelpQuery" class="oc-help-input" type="search" placeholder="Rechercher une aide…" autocomplete="off" enterkeyhint="search">
             <button id="ocHelpClear" class="oc-help-clear" type="button" aria-label="Effacer la recherche">Effacer</button>
@@ -96,7 +95,6 @@
     <div class="oc-help-footer">
         <a class="oc-help-link" href="{{ path('app_recipe_index') }}">🍊 Recettes</a>
         <a class="oc-help-link" href="{{ path('app_my_recipes') }}">📝 Ma recette</a>
-        <a class="oc-help-link" href="{{ path('app_friends') }}">👥 Amis</a>
         <a class="oc-help-link" href="{{ path('app_contact') }}">✉️ Contact</a>
     </div>
 </div>
