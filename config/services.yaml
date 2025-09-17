@@ -10,6 +10,8 @@ parameters:
 
 
 services:
+    App\Twig\:
+        resource: '../src/Twig'
     _defaults:
         autowire: true
         autoconfigure: true
