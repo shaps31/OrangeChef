@@ -46,7 +46,8 @@ final class RecipeController extends AbstractController
 
         // - pagination naïve (OK pour un projet étudiant)
         $page     = max(1, (int) $request->query->get('p', 1));
-        $pageSize = min(30, max(6, (int) $request->query->get('ps', 9)));
+        $pageSize = min(30, max(6, (int) ($request->query->get('ps', $request->query->get('per_page', 9)))));
+
 
         // - critères de base
         $criteria = ['isPublic' => true];
@@ -360,7 +361,8 @@ final class RecipeController extends AbstractController
         $sortDir   = $sort === 'oldest' ? 'ASC' : 'DESC';
 
         $page     = max(1, (int) $request->query->get('p', 1));
-        $pageSize = min(30, max(6, (int) $request->query->get('ps', 9)));
+        $pageSize = min(30, max(6, (int) ($request->query->get('ps', $request->query->get('per_page', 9)))));
+
 
         $all = $recipes->findBy(['author' => $this->getUser()], [$sortField => $sortDir]);
 
