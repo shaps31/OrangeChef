@@ -99,6 +99,8 @@ class OrangeChefController extends AbstractController
     public function envoyerNotification(Request $request, Notification $notification): Response
     {
         $message = null;
+        $to = $this->getParameter('app.notification_to');
+
 
         if ($request->isMethod('POST')) {
             $abc = $request->request->get('abc', 'non précisé');
@@ -106,7 +108,7 @@ class OrangeChefController extends AbstractController
 
             try {
                 $notification->sendTemplate(
-                    to: 'destinataire@domaine.ext',
+                    to: $to,
                     subject: 'Requête reçue',
                     htmlTemplate: 'email/notification_formulaire.html.twig',
                     context: [

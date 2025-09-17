@@ -5,6 +5,7 @@ parameters:
     app.mail.from_address: '%env(APP_EMAIL_FROM_ADDRESS)%'
     app.mail.from_name: '%env(APP_EMAIL_FROM_NAME)%'
     app.contact.to_address: '%env(APP_CONTACT_TO_ADDRESS)%'
+    app.notification_to: 'destinataire@domaine.ext'
 
 services:
     _defaults:
