@@ -7,30 +7,28 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use App\Entity\Recipe;
 use App\Service\Notification;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Repository\ReviewRepository;
+
 
 
 class OrangeChefController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function home(RecipeRepository $recipes, UserRepository $users, \Doctrine\ORM\EntityManagerInterface $em): Response
+    public function home(RecipeRepository $recipes, UserRepository $users, ReviewRepository $reviews): Response
     {
-        $latest = $recipes->createQueryBuilder('r')
-            ->andWhere('r.isPublic = :pub')->setParameter('pub', true)
-            ->orderBy('r.createdAt', 'DESC')
-            ->setMaxResults(3)
-            ->getQuery()->getResult();
+        $latest = $recipes->findBy(
+            ['isPublic' => true],      // critères WHERE
+            ['createdAt' => 'DESC'],   // tri
+            3                          // limite
+        );
 
-        $recipesCount = (int) $em->getRepository(\App\Entity\Recipe::class)->count(['isPublic' => true]);
-        $usersCount   = (int) $em->getRepository(\App\Entity\User::class)->count([]);
-        $reviewsCount = (int) $em->getRepository(\App\Entity\Review::class)->count(['isApproved' => true]);
+        $recipesCount = $recipes->count(['isPublic' => true]);
+        $usersCount   = $users->count([]);
+        $reviewsCount = $reviews->count(['isApproved' => true]);
+
 
         return $this->render('orange_chef/index.html.twig', [
             'latestRecipes' => $latest,

@@ -219,6 +219,7 @@ class OrangeRecipeFixtures extends Fixture implements FixtureGroupInterface
                 ->setCategory($row['category'])
                 ->setDifficulty($row['difficulty'])
                 ->setServings($row['servings'])
+
                 ->setCreatedAt(new \DateTimeImmutable('-'.mt_rand(1,30).' days'));
 
             $this->assignTotalMinutes($r, (int)$row['totalTime']);
