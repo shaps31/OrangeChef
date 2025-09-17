@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{{ subject|default('Requête reçue') }}</title>
+</head>
+<body style="font-family:system-ui,Segoe UI,Arial,sans-serif;">
+<h2>📨 Requête reçue</h2>
+<p>Données du formulaire :</p>
+<ul>
+    <li><strong>abc :</strong> {{ abc|default('non précisé') }}</li>
+    <li><strong>parametre :</strong> {{ parametre|default('non précisé') }}</li>
+</ul>
+<p style="color:#6b7280;font-size:12px;">{{ "now"|date("d/m/Y H:i") }}</p>
+</body>
+</html>

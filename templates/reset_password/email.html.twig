@@ -1,0 +1,26 @@
+<h2>🍊 Réinitialisation de votre mot de passe</h2>
+
+<p>Bonjour,</p>
+
+<p>
+    Vous avez demandé à réinitialiser votre mot de passe. <br>
+    Cliquez sur le lien ci-dessous pour le modifier :
+</p>
+
+<p>
+    <a href="{{ url('app_reset_password', {token: resetToken.token}) }}">
+        🔐 Réinitialiser mon mot de passe
+    </a>
+</p>
+
+<p><strong>⚠️ Ce lien expirera dans 1 heure.</strong></p>
+
+<p>
+    Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.<br>
+    Merci et à bientôt sur <strong>Orange Chef</strong> ! 🍊
+</p>
+
+<hr>
+<p style="font-size: 0.8em; color: gray;">
+    Email envoyé automatiquement par Orange Chef Bot (no-reply@orangechef.com)
+</p>

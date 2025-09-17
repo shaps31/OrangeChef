@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mail envoyé{% endblock %}
+
+{% block body %}
+<div class="example-wrapper">
+    <h1>Confirmation</h1>
+    <p>{{ message }}</p>
+    <a href="{{ path('app_orange_chef') }}">Retour à l'accueil</a>
+</div>
+{% endblock %}

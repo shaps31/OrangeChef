@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter du stock{% endblock %}
+
+{% block body %}
+  <h1>🍊 Ajouter du stock</h1>
+  {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn">Enregistrer</button>
+  {{ form_end(form) }}
+  <p><a href="{{ path('app_inventory_index') }}">← Retour à l'inventaire</a></p>
+{% endblock %}

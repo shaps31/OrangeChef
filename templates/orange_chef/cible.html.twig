@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Oranges en vedette{% endblock %}
+
+{% block body %}
+<div class="example-wrapper">
+    <h1>🍊 Oranges en vedette</h1>
+    <img class="chef-image" src="{{ asset('img/vedette.jpg') }}" alt="Orange Chef" style="max-width: 200px; border-radius: 10px;">
+
+    {% if oranges is not empty %}
+        <div class="orange-grid">
+            {% for orange in oranges %}
+                <div class="orange-card">
+                    <h3>{{ orange.name }}</h3>
+                    <p>Couleur : <strong>{{ orange.color }}</strong></p>
+                    <p class="price">{{ orange.price }} €</p>
+                    <a href="{{ path('app_orange_show', {'id': orange.id}) }}" class="btn-view">
+                        👁 Voir détails
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Aucune orange sélectionnée 🍂</p>
+    {% endif %}
+
+    <a href="{{ path('app_orange_index') }}" class="btn-recette" style="margin-top: 20px; display: inline-block;">
+        📋 Gérer les oranges
+    </a>
+</div>
+{% endblock %}

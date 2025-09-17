@@ -1,0 +1,4 @@
+Bonjour {{ userName|default('chef') }}
+
+Votre recette “{{ title }}” est maintenant en ligne.
+{% if url %}Lien : {{ url }}{% endif %}

@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block body %}
+<div class="example-wrapper">
+    <h1>✏️ Modifier mon profil</h1>
+
+    {# ✅ Avatar actuel #}
+    {% if app.user.avatar %}
+        <div style="margin-bottom: 15px;">
+            <strong>Avatar actuel :</strong><br>
+            <img id="preview-avatar"
+                 src="{{ asset('uploads/avatars/' ~ app.user.avatar) ~ '?v=' ~ random() }}"
+                 alt="Avatar"
+                 style="height:80px; border-radius:50%; box-shadow:0 0 3px rgba(0,0,0,0.2); margin-top:10px;">
+        </div>
+    {% endif %}
+
+    {{ form_start(form) }}
+        {{ form_row(form.email) }}
+        {{ form_row(form.nom) }}
+        {{ form_row(form.prenom) }}
+        {{ form_row(form.avatar, {
+            'attr': {'onchange': 'previewAvatar(this)'}
+        }) }}
+        <button class="btn">✅ Sauvegarder</button>
+    {{ form_end(form) }}
+
+    <p style="margin-top:20px;">
+        <a href="{{ path('app_profil') }}">🔙 Retour à mon compte</a>
+    </p>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        function previewAvatar(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('preview-avatar').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+{% endblock %}

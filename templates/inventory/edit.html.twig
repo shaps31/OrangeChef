@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le stock{% endblock %}
+
+{% block body %}
+  <h1>✏️ Modifier le stock</h1>
+  {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn">Mettre à jour</button>
+  {{ form_end(form) }}
+  <p><a href="{{ path('app_inventory_index') }}">← Retour à l'inventaire</a></p>
+{% endblock %}

@@ -1,0 +1,75 @@
+{# _partials/share.html.twig #}
+{% set url  = absolute_url(path('app_recipe_show', { id: recipe.id })) %}
+{% set text = (recipe.title ~ ' • Orange Chef') %}
+
+<div class="share">
+    <span class="share-label">Partager :</span>
+
+    <a class="share-btn fb"
+       href="https://www.facebook.com/sharer/sharer.php?u={{ url|url_encode }}"
+       target="_blank" rel="noopener">Facebook</a>
+
+    <a class="share-btn x"
+       href="https://twitter.com/intent/tweet?url={{ url|url_encode }}&text={{ text|url_encode }}"
+       target="_blank" rel="noopener">X</a>
+
+    <a class="share-btn wa"
+       href="https://api.whatsapp.com/send?text={{ (text ~ ' ' ~ url)|url_encode }}"
+       target="_blank" rel="noopener">WhatsApp</a>
+
+    <a class="share-btn mail"
+       href="mailto:?subject={{ text|url_encode }}&body={{ (desc|default('') ~ '%0A' ~ url)|raw }}">
+        E-mail
+    </a>
+
+    <button class="share-btn copy" type="button" data-copy="{{ url }}">Copier le lien</button>
+    <button class="share-btn native" type="button" data-share
+            data-title="{{ recipe.title }}" data-text="{{ desc|default('') }}" data-url="{{ url }}">
+        Partager…
+    </button>
+</div>
+
+<script>
+    (function () {
+        // Copier le lien
+        document.querySelectorAll('.share-btn.copy').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(btn.dataset.copy);
+                    btn.textContent = 'Lien copié ✔';
+                    setTimeout(() => btn.textContent = 'Copier le lien', 1500);
+                } catch (e) {
+                    alert('Impossible de copier le lien');
+                }
+            });
+        });
+
+        // Web Share API (mobile)
+        document.querySelectorAll('[data-share]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const payload = {
+                    title: btn.dataset.title || document.title,
+                    text:  btn.dataset.text  || '',
+                    url:   btn.dataset.url   || location.href
+                };
+                if (navigator.share) {
+                    try { await navigator.share(payload); } catch(e) {}
+                } else {
+                    alert('Le partage natif n’est pas disponible sur ce navigateur.');
+                }
+            });
+        });
+    })();
+</script>
+
+<style>
+    .share{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin:.75rem 0 0; }
+    .share-label{ color:#5b6270; margin-right:.25rem; }
+    .share-btn{ padding:.4rem .6rem; border:1px solid rgba(0,0,0,.08); border-radius:999px; background:#fff;
+        font-weight:600; box-shadow:0 2px 10px rgba(0,0,0,.05); text-decoration:none; }
+    .share-btn.fb{ background:#e7f0ff; border-color:#cfe2ff; }
+    .share-btn.x{ background:#efefef; }
+    .share-btn.wa{ background:#e8fff2; border-color:#c8f5db; }
+    .share-btn.mail{ background:#fff7eb; border-color:#ffe1bf; }
+    .share-btn.copy, .share-btn.native{ background:#fff; }
+</style>

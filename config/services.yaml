@@ -1,20 +1,32 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+# config/services.yaml
 parameters:
+    avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+    recipes_directory: '%kernel.project_dir%/public/uploads/recipes'
+    app.mail.from_address: '%env(APP_EMAIL_FROM_ADDRESS)%'
+    app.mail.from_name: '%env(APP_EMAIL_FROM_NAME)%'
+    app.contact.to_address: '%env(APP_CONTACT_TO_ADDRESS)%'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
+        public: false
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+    # Toutes les classes de src/ en services (sauf exclusions)
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    #  Contrôleurs tagués (sinon “controller is private / too few arguments”)
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+    # ➜ Service personnalisé avec arguments
+    App\Service\Notification:
+        arguments:
+            $fromAddress: '%app.mail.from_address%'
+            $fromName: '%app.mail.from_name%'

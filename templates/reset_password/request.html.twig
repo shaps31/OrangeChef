@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}🔐 Réinitialisation du mot de passe{% endblock %}
+
+{% block body %}
+    <h1>🔐 Réinitialiser mon mot de passe</h1>
+
+    {{ form_start(requestForm) }}
+        {{ form_row(requestForm.email, {
+            label: 'Adresse e-mail',
+            attr: {'placeholder': 'Entrez votre adresse e-mail'}
+        }) }}
+
+        <button class="btn-recette">📩 Envoyer le lien de réinitialisation</button>
+    {{ form_end(requestForm) }}
+{% endblock %}

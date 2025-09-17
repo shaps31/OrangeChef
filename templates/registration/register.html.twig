@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block body %}
+    <div class="form-container">
+        <h1>🍊 Crée ton compte Orange Chef</h1>
+
+        {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+            <div>
+                {{ form_label(registrationForm.email, "Adresse e-mail") }}
+                {{ form_widget(registrationForm.email) }}
+            </div>
+
+            <div>
+                {{ form_label(registrationForm.nom, "Nom") }}
+                {{ form_widget(registrationForm.nom) }}
+            </div>
+
+            <div>
+                {{ form_label(registrationForm.prenom, "Prénom") }}
+                {{ form_widget(registrationForm.prenom) }}
+            </div>
+
+            <div>
+                {{ form_label(registrationForm.avatar, "Avatar (facultatif)") }}
+                {{ form_widget(registrationForm.avatar) }}
+            </div>
+
+            <div>
+                {{ form_label(registrationForm.roles, "Rôle") }}
+                {{ form_widget(registrationForm.roles) }}
+            </div>
+
+            <div>
+                {{ form_label(registrationForm.plainPassword, "Mot de passe") }}
+                {{ form_widget(registrationForm.plainPassword) }}
+            </div>
+
+            <div class="checkbox-field">
+                {{ form_widget(registrationForm.agreeTerms) }}
+                {{ form_label(registrationForm.agreeTerms, "J'accepte les conditions d'utilisation") }}
+            </div>
+
+            <button class="btn">🍊 S’inscrire maintenant</button>
+
+        {{ form_end(registrationForm) }}
+
+        <p class="alt-option">Un compte, et la recette parfaite est à portée de main ! 🍽️</p>
+    </div>
+{% endblock %}

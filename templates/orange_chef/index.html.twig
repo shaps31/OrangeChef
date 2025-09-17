@@ -1,0 +1,189 @@
+{# templates/orange_chef/index.html.twig #}
+{% extends 'base.html.twig' %}
+{% import '_macros/media.html.twig' as media %}
+
+{% block title %}Orange Chef{% endblock %}
+
+{% block body %}
+    <div class="home">
+
+        {# HERO ------------------------------------------------ #}
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Bienvenue chez <span>Orange Chef</span> 🍊👨‍🍳</h1>
+                <p>Recettes ensoleillées, astuces anti-gaspi et une touche de fraîcheur vitaminée.</p>
+                <div class="cta">
+                    <a href="{{ path('app_recipe_index') }}" class="btn btn-primary">Découvrir les recettes</a>
+                    <a href="{{ path('app_my_recipes') }}" class="btn btn-secondary">Créer ma recette</a>
+                    <a href="{{ path('app_contact') }}" class="btn btn-outline">Nous contacter</a>
+                </div>
+
+                <div class="hero-metrics">
+                    <span class="chip metric">🍽️ {{ recipesCount|default(0) }} recettes</span>
+                    <span class="chip metric">⭐ {{ reviewsCount|default(0) }} avis</span>
+                    <span class="chip metric">👥 {{ usersCount|default(0) }} membres</span>
+                    <span class="chip ok">✅ 100% gratuit</span>
+                </div>
+            </div>
+
+            <figure class="hero-media">
+                <div class="hero-illustration">
+                    {{ media.image('img/vedette.jpg', 'Orange Chef', 'hero', 720, 960, 'rounded-xl shadow-lg') }}
+                </div>
+            </figure>
+        </section>
+
+        {# POURQUOI -------------------------------------------- #}
+        <section class="features">
+            <h2 class="section-title">Pourquoi Orange Chef ?</h2>
+
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <div class="feature-icon">🍽️</div>
+                    <h3 class="feature-title">Recettes gourmandes</h3>
+                    <p class="feature-text">Des idées rapides et fiables pour briller en cuisine, avec l’orange en star.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">⏳</div>
+                    <h3 class="feature-title">Anti-gaspi malin</h3>
+                    <p class="feature-text">Suivez les dates limites, cuisinez vos oranges à temps et évitez le gaspillage.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3 class="feature-title">Notes & avis</h3>
+                    <p class="feature-text">Partagez vos créations, notez les recettes et inspirez la communauté.</p>
+                </article>
+            </div>
+        </section>
+
+        {# À LA UNE -------------------------------------------- #}
+        <section class="preview">
+            <h2 class="section-title">À la une</h2>
+
+            <div class="teaser-grid">
+                {% for r in latestRecipes %}
+                    <article class="teaser-card">
+                        <a href="{{ path('app_recipe_show', { id: r.id }) }}" class="teaser-thumb" aria-label="{{ r.titre ?? r.title }}">
+                            {{ media.image(
+                                r.image ? ('/uploads/recipes/' ~ r.image) : 'assets/img/placeholder-recipe.jpg',
+                            r.titre ?? r.title,
+                            'card',
+                            480, 320,
+                            'card-img-top rounded'
+                            ) }}
+                        </a>
+
+                        <div class="teaser-content">
+                            <h3 class="teaser-title">
+                                <a href="{{ path('app_recipe_show', { id: r.id }) }}">{{ r.titre ?? r.title }}</a>
+                            </h3>
+                            <p class="teaser-excerpt">
+                                {{ (r.resume ?? r.description ?? '')|striptags|u.truncate(110, '…') }}
+                            </p>
+                        </div>
+                    </article>
+                {% else %}
+                    <p class="muted">Aucune recette pour le moment. <a href="{{ path('app_my_recipes') }}">Ajoute la première</a> 🍊</p>
+                {% endfor %}
+            </div>
+
+            <div class="preview-actions">
+                <a class="btn btn-primary" href="{{ path('app_recipe_index') }}">Voir toutes les recettes</a>
+            </div>
+        </section>
+
+        {# QUOTE ------------------------------------------------ #}
+        <section class="quote">
+            <blockquote>« La cuisine, c’est l’art de transformer de simples ingrédients en souvenirs mémorables. »</blockquote>
+        </section>
+    </div>
+
+    {# styles locaux #}
+    <style>
+        .home { display:flex; flex-direction:column; gap:26px; }
+
+        .hero{
+            display:grid; grid-template-columns: 1.1fr .9fr; align-items:center; gap:18px;
+            background: radial-gradient(1200px 600px at 20% -10%, #ffe0b2 10%, transparent 60%), linear-gradient(135deg,#fff,#fffaf2);
+            border-radius:18px; padding:24px; box-shadow:0 8px 26px rgba(0,0,0,.06);
+        }
+        .hero-content h1 { margin:0 0 6px; font-size:2.1rem; }
+        .hero-content h1 span { color:#ff9800; }
+        .hero-content p { margin:0 0 12px; color:#666; }
+        .cta { display:flex; gap:10px; }
+
+        .hero-media{ display:flex; justify-content:center; }
+        .hero-illustration img{ border-radius:18px; box-shadow:0 14px 40px rgba(0,0,0,.12); }
+
+        .hero-metrics{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+        .chip{ display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; font-weight:600; background:#fff;
+            color:#1f2430; border:1px solid rgba(0,0,0,.06); box-shadow:0 2px 8px rgba(0,0,0,.05); }
+        .chip.metric{ background:#fff7eb; border-color:#ffe1bf; }
+        .chip.ok{ background:#ecf8ef; color:#1b4d2a; border-color:#b9ebc9; }
+
+        .features{ margin-top:12px; }
+        .section-title{ margin:10px 0 14px; font-size:1.6rem; font-weight:800; color:#23262B; }
+        .feature-grid{ display:grid; grid-template-columns: repeat(12, 1fr); gap:16px; }
+        .feature-card{ grid-column: span 4; background:#fff; border-radius:14px; padding:16px 16px 18px;
+            box-shadow:0 6px 18px rgba(0,0,0,.06); border-top:4px solid #ff9800; transition:.2s; }
+        .feature-card:hover{ transform: translateY(-3px); box-shadow:0 12px 26px rgba(0,0,0,.10); }
+        .feature-icon{ width:42px; height:42px; display:grid; place-items:center; background:#fff7eb; border:1px solid #ffe1bf;
+            border-radius:10px; font-size:22px; margin-bottom:10px; }
+        .feature-title{ margin:0 0 6px; font-size:1.1rem; }
+        .feature-text{ margin:0; color:#5b6270; line-height:1.5; }
+
+        @media (max-width:1024px){ .feature-card{ grid-column: span 6; } }
+        @media (max-width:640px){ .hero{ grid-template-columns:1fr; text-align:center; }
+            .cta{ justify-content:center; flex-wrap:wrap; }
+            .feature-card{ grid-column: span 12; } }
+
+        .teaser-grid{ display:grid; grid-template-columns: repeat(12, 1fr); gap:18px; }
+        .teaser-card{ grid-column: span 4; display:flex; flex-direction:column; gap:10px; }
+        @media (max-width:1024px){ .teaser-card{ grid-column: span 6; } }
+        @media (max-width:640px){ .teaser-card{ grid-column: span 12; } }
+
+        .teaser-thumb img{ width:100%; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:14px; box-shadow:0 8px 20px rgba(0,0,0,.08); }
+        .teaser-title{ margin:0 0 6px; font-size:1.05rem; }
+        .teaser-excerpt{ margin:0; color:#5b6270; }
+        /* === HERO compact & clean (force la taille de l'image) === */
+        .home .hero{
+            display:grid;
+            grid-template-columns: 1fr minmax(260px, 420px); /* texte large / image max 420px */
+            gap: clamp(16px, 3vw, 32px);
+            align-items: center;
+        }
+
+        .home .hero-media{
+            display:flex;
+            justify-content:center;
+        }
+
+        .home .hero-illustration{
+            width: 100%;
+            max-width: 420px;           /* taille max de l’image */
+            justify-self: center;
+        }
+
+        .home .hero-illustration img{
+            display:block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 3 / 4;        /* ratio visuel stable */
+            object-fit: cover;          /* recadrage propre si besoin */
+            max-height: clamp(320px, 60vh, 520px);
+            border-radius: 18px;
+            border: 6px solid #fff;
+            box-shadow: 0 14px 40px rgba(0,0,0,.12);
+        }
+
+        /* Mobile/tablette : image centrée, un poil plus petite */
+        @media (max-width: 992px){
+            .home .hero{ grid-template-columns: 1fr; }
+            .home .hero-illustration{ max-width: 360px; }
+        }
+
+    </style>
+
+{% endblock %}

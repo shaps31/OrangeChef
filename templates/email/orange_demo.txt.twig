@@ -1,0 +1,11 @@
+Bonjour {{ userName|default('ami·e d’OrangeChef') }}
+
+abc : {{ abc|default('—') }}
+parametre : {{ parametre|default('—') }}
+
+{% if ctaUrl is defined and ctaUrl -%}
+Action : {{ ctaUrl }}
+{%- endif %}
+
+--
+OrangeChef – {{ "now"|date("d/m/Y H:i") }}

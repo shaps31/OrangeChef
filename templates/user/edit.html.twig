@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l’utilisateur — {{ user.displayName ?? user.email }}{% endblock %}
+
+{% block body %}
+    <div class="container py-3">
+
+        {# Fil d'Ariane #}
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_user_index') }}">Utilisateurs</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Modifier</li>
+            </ol>
+        </nav>
+
+        {# Flashes #}
+        {% for type, messages in app.flashes %}
+            {% for msg in messages %}
+                <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                    {{ msg }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                {# En-tête #}
+                <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                    <div class="avatar-xxl rounded-circle overflow-hidden bg-light flex-shrink-0"
+                         style="width:72px;height:72px;display:flex;align-items:center;justify-content:center">
+                        {% if user.avatar ?? false %}
+                            <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Avatar" class="img-fluid">
+                        {% else %}
+                            <span class="fs-2">👤</span>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <h1 class="h4 mb-1">{{ user.displayName ?? user.email }}</h1>
+                        <div class="small text-muted">{{ user.email }}</div>
+                        <div class="mt-1">
+                            {% for r in user.roles %}
+                                {% set label = r == 'ROLE_ADMIN' ? 'Admin' : (r == 'ROLE_USER' ? 'Membre' : r) %}
+                                <span class="badge {{ r == 'ROLE_ADMIN' ? 'bg-danger' : 'bg-secondary' }}">{{ label }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="ms-auto">
+                        <a class="btn btn-outline-secondary" href="{{ path('app_user_index') }}">← Retour</a>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                {# Formulaire (réutilise ton partial) #}
+                {{ include('user/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-outline-primary" href="{{ path('app_change_password') }}">🔒 Modifier le mot de passe</a>
+                        <a class="btn btn-outline-secondary" href="{{ path('app_user_index') }}">Liste des utilisateurs</a>
+                    </div>
+                    <div>
+                        {{ include('user/_delete_form.html.twig') }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <style>
+        .avatar-xxl img { width:100%; height:100%; object-fit:cover; }
+    </style>
+{% endblock %}

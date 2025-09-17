@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stock — {{ inventory.variety|title }}{% endblock %}
+
+{% block body %}
+    <div class="container py-3">
+
+        {# --- Calculs statut --- #}
+        {% set now = date('now') %}
+        {% set hasExp = inventory.expirationDate is not null %}
+        {% set soonLimit = date('+3 days') %}
+        {% set status = hasExp
+            ? (inventory.expirationDate < now ? 'expired' : (inventory.expirationDate < soonLimit ? 'soon' : 'ok'))
+            : 'none' %}
+        {% set qty = inventory.quantity|default(0) %}
+        {% set qtyState = qty <= 0 ? 'out' : (qty <= 3 ? 'low' : 'ok') %}
+
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_inventory_index') }}">Inventaire</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ inventory.variety|title }}</li>
+            </ol>
+        </nav>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                    <div>
+                        <h1 class="h3 mb-1">📦 {{ inventory.variety|title }}</h1>
+                        <div class="d-flex gap-2">
+                            {# Stock #}
+                            {% if qtyState == 'out' %}
+                                <span class="badge bg-danger">Rupture</span>
+                            {% elseif qtyState == 'low' %}
+                                <span class="badge bg-warning text-dark">Stock faible</span>
+                            {% else %}
+                                <span class="badge bg-success">En stock</span>
+                            {% endif %}
+
+                            {# Péremption #}
+                            {% if status == 'expired' %}
+                                <span class="badge bg-danger">Périmé</span>
+                            {% elseif status == 'soon' %}
+                                <span class="badge bg-warning text-dark">Péremption imminente</span>
+                            {% elseif status == 'ok' %}
+                                <span class="badge bg-secondary">Frais</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Sans date</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <a class="btn btn-outline-secondary me-2" href="{{ path('app_inventory_index') }}">← Retour</a>
+                        <a class="btn btn-primary" href="{{ path('app_inventory_edit', {id: inventory.id}) }}">✏️ Modifier</a>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded-3">
+                            <div class="small text-muted">Quantité</div>
+                            <div class="fs-4 fw-semibold">{{ qty }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded-3">
+                            <div class="small text-muted">Expiration</div>
+                            <div class="fs-5">
+                                {% if hasExp %}
+                                    {{ inventory.expirationDate|date('d/m/Y') }}
+                                {% else %}—{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 border rounded-3">
+                            <div class="small text-muted">Statut</div>
+                            <div class="fs-5">
+                                {% if status == 'expired' %}⛔ Périmé
+                                {% elseif status == 'soon' %}⏳ Bientôt périmé
+                                {% elseif status == 'ok' %}✅ OK
+                                {% else %}—{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

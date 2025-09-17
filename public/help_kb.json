@@ -1,0 +1,51 @@
+{
+    "categories": [
+        {
+            "id": "recipes",
+            "label": "Recettes",
+            "items": [
+                { "q": "Trouver des recettes rapidement", "a": "Ouvrez « Recettes ». Combinez mot-clé + filtre (durée, difficulté).", "href": "route:app_recipe_index" },
+                { "q": "Ajouter ma recette", "a": "Renseignez titre, ingrédients, étapes. Image: upload ou URL https.", "href": "route:app_recipe_new" },
+                { "q": "Je ne retrouve plus une recette", "a": "Cherchez par morceau de titre (ex: « tarte ») ou tri « Plus récentes ».", "href": "route:app_my_recipes" }
+            ]
+        },
+        {
+            "id": "friends",
+            "label": "Amis",
+            "items": [
+                { "q": "Gérer mes amis", "a": "Ajoutez/validez des amis depuis la page dédiée.", "href": "route:app_friends" }
+            ]
+        },
+        {
+            "id": "inventory",
+            "label": "Inventaire",
+            "items": [
+                { "q": "Voir mon inventaire", "a": "Suivez quantités et dates limites, triez par DLC proche.", "href": "route:app_inventory_index" },
+                { "q": "Créer une entrée", "a": "Cliquez « Nouveau », indiquez quantité et date d’expiration.", "href": "route:app_inventory_new" },
+                { "q": "Alertes d’expiration", "a": "Traitez les items urgents pour éviter le gaspillage.", "href": "route:app_inventory_alerts" }
+            ]
+        },
+        {
+            "id": "account",
+            "label": "Compte & profil",
+            "items": [
+                { "q": "Mon profil", "a": "Changez nom, avatar, préférences d’affichage.", "href": "route:app_profil" },
+                { "q": "Changer mon mot de passe", "a": "Utilisez le formulaire dédié.", "href": "route:app_change_password" }
+            ]
+        },
+        {
+            "id": "dashboard",
+            "label": "Dashboard",
+            "items": [
+                { "q": "Accéder au tableau de bord", "a": "Stats, raccourcis, activités récentes.", "href": "route:app_dashboard" }
+            ]
+        },
+        {
+            "id": "contact",
+            "label": "Contact",
+            "items": [
+                { "q": "Contacter l’équipe", "a": "Formulaire protégé par honeypot (démo).", "href": "route:app_contact" }
+            ]
+        }
+    ]
+}

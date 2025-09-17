@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #ff9800, #f57c00); color: white; padding: 30px; text-align: center; }
+        .content { padding: 30px; }
+        .button { display: inline-block; background: linear-gradient(135deg, #ff9800, #f57c00); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 20px 0; }
+        .footer { background: #fff3e0; padding: 20px; text-align: center; color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍊 Bienvenue sur Orange Chef !</h1>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour <strong>{{ user.prenom ?? user.email }}</strong>,</p>
+            
+            <p>🎉 Félicitations ! Ton compte Orange Chef a été créé avec succès.</p>
+            
+            <p>Pour commencer à partager tes délicieuses recettes à l'orange et découvrir celles de notre communauté, il te suffit de confirmer ton adresse e-mail :</p>
+            
+            <p style="text-align: center;">
+                <a href="{{ signedUrl }}" class="button">
+                    ✅ Confirmer mon adresse e-mail
+                </a>
+            </p>
+            
+            <p>Une fois ton compte activé, tu pourras :</p>
+            <ul>
+                <li>🍊 Créer et partager tes recettes</li>
+                <li>📦 Gérer ton stock d'oranges</li>
+                <li>⭐ Noter et commenter les recettes</li>
+                <li>📊 Suivre tes statistiques</li>
+                <li>🏆 Progresser dans les niveaux de chef</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>Merci de rejoindre la communauté Orange Chef ! 🍊</p>
+            <small>Si tu n'as pas créé ce compte, tu peux ignorer cet e-mail.</small>
+        </div>
+    </div>
+</body>
+</html>

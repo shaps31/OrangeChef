@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateur — {{ user.displayName ?? user.email }}{% endblock %}
+
+{% block body %}
+    <div class="container py-3">
+
+        {# Fil d'Ariane #}
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_user_index') }}">Utilisateurs</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Détail</li>
+            </ol>
+        </nav>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                {# En-tête #}
+                <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                    <div class="avatar-xxl rounded-circle overflow-hidden bg-light flex-shrink-0"
+                         style="width:72px;height:72px;display:flex;align-items:center;justify-content:center">
+                        {% if user.avatar is defined and user.avatar %}
+                            <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Avatar" class="img-fluid">
+                        {% else %}
+                            <span class="fs-2">👤</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="me-auto">
+                        <h1 class="h4 mb-1">{{ user.displayName ?? user.email }}</h1>
+                        <div class="small">
+                            <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                        </div>
+                        <div class="mt-1 d-flex gap-2 align-items-center flex-wrap">
+                            {# Statut vérification #}
+                            {% if user.isVerified %}
+                                <span class="badge bg-success">Vérifié</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Non vérifié</span>
+                            {% endif %}
+
+                            {# Rôles #}
+                            {% set roleLabels = {
+                                'ROLE_ADMIN': 'Admin',
+                                'ROLE_USER':  'Membre'
+                            } %}
+                            {% for r in user.roles ?? [] %}
+                                <span class="badge {{ r == 'ROLE_ADMIN' ? 'bg-danger' : 'bg-secondary' }}">
+                {{ roleLabels[r] ?? r }}
+              </span>
+                            {% else %}
+                                <span class="text-muted">Aucun rôle</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <a class="btn btn-outline-secondary me-2" href="{{ path('app_user_index') }}">← Retour</a>
+                        <a class="btn btn-primary" href="{{ path('app_user_edit', { id: user.id }) }}">✏️ Modifier</a>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                {# Détails #}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <tbody>
+                        <tr>
+                            <th scope="row" class="w-25 text-muted">ID</th>
+                            <td>{{ user.id }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-muted">E-mail</th>
+                            <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-muted">Rôles</th>
+                            <td>
+                                {% for r in user.roles ?? [] %}
+                                    <span class="badge {{ r == 'ROLE_ADMIN' ? 'bg-danger' : 'bg-secondary' }}">
+                    {{ roleLabels[r] ?? r }}
+                  </span>
+                                {% else %}
+                                    <span class="text-muted">Aucun rôle</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-muted">Mot de passe</th>
+                            <td class="text-muted">●●●●●●●● (non affiché)</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-muted">Vérification e-mail</th>
+                            <td>
+                                {% if user.isVerified %}
+                                    <span class="badge bg-success">Vérifié</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Non vérifié</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {# Champs optionnels si présents dans ton entité (affichés seulement s’ils existent) #}
+                        {% if user.createdAt is defined and user.createdAt %}
+                            <tr>
+                                <th scope="row" class="text-muted">Créé le</th>
+                                <td>{{ user.createdAt|date('d/m/Y H:i') }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if user.lastLoginAt is defined and user.lastLoginAt %}
+                            <tr>
+                                <th scope="row" class="text-muted">Dernière connexion</th>
+                                <td>{{ user.lastLoginAt|date('d/m/Y H:i') }}</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                    <div>
+                        <a class="btn btn-outline-secondary" href="{{ path('app_user_index') }}">← Retour à la liste</a>
+                        <a class="btn btn-outline-primary" href="{{ path('app_user_edit', { id: user.id }) }}">Modifier</a>
+                    </div>
+                    <div>
+                        {{ include('user/_delete_form.html.twig') }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .avatar-xxl img { width:100%; height:100%; object-fit:cover; }
+    </style>
+{% endblock %}

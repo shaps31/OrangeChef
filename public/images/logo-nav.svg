@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Orange Chef — NAV logo (dark bg) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Orange Chef — Logo nav">
+    <defs>
+        <!-- Anneau orange bien punchy -->
+        <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"   stop-color="#ffb65c"/>
+            <stop offset="55%"  stop-color="#ff7a00"/>
+            <stop offset="100%" stop-color="#e35800"/>
+        </linearGradient>
+        <!-- Reflet doux -->
+        <radialGradient id="gloss" cx="32%" cy="28%" r="46%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity=".55"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+        </radialGradient>
+        <!-- Feuille -->
+        <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"   stop-color="#34d399"/>
+            <stop offset="100%" stop-color="#059669"/>
+        </linearGradient>
+        <!-- Ombre douce pour la feuille -->
+        <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity=".35"/>
+        </filter>
+    </defs>
+
+    <!-- Anneau principal (orange) -->
+    <circle cx="100" cy="110" r="70" fill="none" stroke="url(#ringGrad)" stroke-width="12"/>
+    <!-- léger “gloss” sur l’anneau -->
+    <path d="M50 92 A 60 60 0 0 1 96 58" stroke="url(#gloss)" stroke-width="4" fill="none" stroke-linecap="round" opacity=".85"/>
+
+    <!-- TOQUE : double trait (ombre puis blanc) pour la lisibilité sur fond sombre -->
+    <!-- Ombre dessous (élargie) -->
+    <path d="M66 88 C 66 70, 88 60, 100 68 C 112 60, 134 70, 134 88
+           C 150 90, 152 104, 140 110 C 128 116, 114 114, 100 112
+           C 86 114, 72 116, 60 110 C 48 104, 50 90, 66 88 Z"
+          fill="none" stroke="rgba(0,0,0,.55)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Trait blanc principal -->
+    <path d="M66 88 C 66 70, 88 60, 100 68 C 112 60, 134 70, 134 88
+           C 150 90, 152 104, 140 110 C 128 116, 114 114, 100 112
+           C 86 114, 72 116, 60 110 C 48 104, 50 90, 66 88 Z"
+          fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Bande de la toque (ombre + blanc) -->
+    <rect x="68" y="98" width="64" height="16" rx="8" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="11"/>
+    <rect x="68" y="98" width="64" height="16" rx="8" fill="none" stroke="#ffffff" stroke-width="7"/>
+
+    <!-- Tige + feuille (bord blanc pour contraste) -->
+    <line x1="142" y1="50" x2="142" y2="62" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M148 54 C 162 50, 168 64, 156 74 C 148 80, 142 72, 148 54 Z"
+          fill="url(#leafGrad)" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round" filter="url(#soft)"/>
+</svg>

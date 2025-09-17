@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Envoyer une notification{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <h1 class="mb-3">🍊 Envoie une notification juteuse !</h1>
+
+        {% if message is defined and message %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endif %}
+
+
+        <form method="post" action="{{ path('app_envoyer_notification') }}" class="card p-3 shadow-sm">
+            <div class="mb-3">
+                <label for="abc" class="form-label">abc</label>
+                <input
+                    type="text" id="abc" name="abc" required
+                    class="form-control"
+                    placeholder="ex: 123"
+                    value="{{ app.request.request.get('abc') ?? '' }}"
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="parametre" class="form-label">parametre</label>
+                <input
+                    type="text" id="parametre" name="parametre"
+                    class="form-control"
+                    placeholder="ex: info optionnelle"
+                    value="{{ app.request.request.get('parametre') ?? '' }}"
+                >
+            </div>
+
+            {# Si  ajout plus tard une vérif CSRF côté contrôleur :
+    <input type="hidden" name="_token" value="{{ csrf_token('notify') }}">
+            #}
+
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                🍹 Presser l’orange (Envoyer le mail)
+            </button>
+        </form>
+
+        <p class="mt-4 fst-italic" style="color:#ff8800;">
+            "Une orange par jour éloigne le bug pour toujours... ou presque." 🍊
+        </p>
+    </div>
+
+    <script>
+        // Évite les doubles envois
+        const btn = document.getElementById('submitBtn');
+        if (btn) {
+            document.querySelector('form')?.addEventListener('submit', () => {
+                btn.disabled = true; btn.innerText = 'Envoi...';
+            });
+        }
+    </script>
+{% endblock %}

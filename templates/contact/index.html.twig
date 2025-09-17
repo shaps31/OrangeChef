@@ -1,0 +1,90 @@
+{# On hérite du layout principal #}
+{% extends 'base.html.twig' %}
+
+{# <title> de la page #}
+{% block title %}Contactez-nous 🍊 | Orange Chef{% endblock %}
+
+{% block body %}
+    <div class="container">
+
+        {# --- Messages flash (succès / warning / erreurs globales) --- #}
+        {# Affiche ce qu'on mets avec $this->addFlash() dans le contrôleur #}
+        {% for label, messages in app.flashes %}
+            {% for msg in messages %}
+                <div class="alert alert-{{ label }}" role="alert">{{ msg }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="recipe-header" style="text-align:center;margin-bottom:24px;">
+            <h1>🍊 Contactez-nous</h1>
+            <p>Une question, une suggestion ou une recette à proposer ? Écrivez-nous !</p>
+        </div>
+
+        <div class="recipe-form-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:20px;max-width:840px;margin:0 auto;">
+            {# form_start gère l’action, la méthode (POST par défaut) + le token CSRF #}
+            {# novalidate = on désactive la validation HTML5 pour laisser faire Symfony #}
+            {{ form_start(form, { attr: { class: 'contact-form', novalidate: 'novalidate', id: 'contactForm' } }) }}
+
+            {# Erreurs globales éventuelles du formulaire #}
+            {{ form_errors(form) }}
+
+            {# --- Honeypot anti-spam ---
+         - caché visuellement ET pour les lecteurs d'écran
+         - si un bot le remplit, le contrôleur traite ça comme spam
+            #}
+            <div style="display:none;visibility:hidden;" aria-hidden="true">
+                {{ form_row(form.website, { attr: { tabindex: '-1', autocomplete: 'off' } }) }}
+            </div>
+
+            <div class="form-row" style="display:flex;gap:16px;flex-wrap:wrap;">
+                <div class="form-group" style="flex:1;min-width:220px;">
+                    {{ form_label(form.name) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'form-control', 'autocomplete': 'name'}}) }}
+                    {{ form_errors(form.name) }}
+                </div>
+                <div class="form-group" style="flex:1;min-width:220px;">
+                    {{ form_label(form.email) }}
+                    {{ form_widget(form.email, {'attr': {'class': 'form-control', 'autocomplete': 'email'}}) }}
+                    {{ form_errors(form.email) }}
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top:12px;">
+                {{ form_label(form.subject) }}
+                {{ form_widget(form.subject, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.subject) }}
+            </div>
+
+            <div class="form-group" style="margin-top:12px;">
+                {{ form_label(form.message) }}
+                {{ form_widget(form.message, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.message) }}
+            </div>
+
+            <div class="form-actions" style="display:flex;gap:10px;margin-top:16px;">
+                {# Le bouton Submit vient de ContactType (SubmitType) #}
+                {{ form_widget(form.submit, { attr: { id: 'contactSubmit' } }) }}
+
+                {# Lien d’annulation : retour à la liste des recettes #}
+                <a href="{{ path('app_recipe_index') }}" class="btn btn-secondary">Annuler</a>
+            </div>
+
+            {# form_end inclut le form_rest (champs cachés restants, ex: CSRF) et ferme le <form> #}
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    {# --- Anti double-soumission : on désactive le bouton au submit --- #}
+    <script>
+        const formEl = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('contactSubmit');
+        if (formEl && submitBtn) {
+            formEl.addEventListener('submit', () => {
+                submitBtn.disabled = true;
+                const original = submitBtn.innerText;
+                submitBtn.dataset.original = original;
+                submitBtn.innerText = 'Envoi...';
+            });
+        }
+    </script>
+{% endblock %}

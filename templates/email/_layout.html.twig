@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{{ subject|default('OrangeChef') }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="margin:0;background:#f6f7f9;font-family:system-ui,Segoe UI,Arial,sans-serif;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f6f7f9;padding:24px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;">
+                <tr>
+                    <td style="padding:16px 20px;background:#fff7ef;border-bottom:1px solid #f3e7dc;">
+                        <strong style="font-size:18px;">🍊 OrangeChef</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px;">
+                        {{ block('content') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:16px 20px;border-top:1px solid #eee;color:#6b7280;font-size:12px;">
+                        Mail envoyé par OrangeChef • {{ "now"|date("d/m/Y H:i") }}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

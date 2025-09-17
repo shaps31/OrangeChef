@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes amis | Orange Chef{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="recipe-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+    <h1>👥 Mes amis (démo)</h1>
+    <a class="btn btn-secondary" href="{{ path('app_dashboard') }}">↩ Retour</a>
+  </div>
+
+  <div class="recipe-form-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:16px;">
+    <p>Ajoutez des utilisateurs en amis. Cette fonctionnalité est une démonstration (stockée en session).</p>
+    <div class="table-responsive">
+      <table class="table" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:8px;">#</th>
+            <th style="text-align:left;padding:8px;">Nom</th>
+            <th style="text-align:left;padding:8px;">Email</th>
+            <th style="text-align:left;padding:8px;">Statut</th>
+            <th style="text-align:left;padding:8px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            {% if me and u.id != me.id %}
+              {% set isSent = u.id in sent %}
+              {% set isAccepted = u.id in accepted %}
+              <tr style="border-top:1px solid #eee;">
+                <td style="padding:8px;">{{ u.id }}</td>
+                <td style="padding:8px;">{{ u.displayName ?? u.email }}</td>
+                <td style="padding:8px;">{{ u.email }}</td>
+                <td style="padding:8px;">
+                  {% if isAccepted %}
+                    ✅ Ami
+                  {% elseif isSent %}
+                    ⏳ Demande envoyée
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td style="padding:8px;display:flex;gap:8px;">
+                  {% if not isAccepted and not isSent %}
+                    <form action="{{ path('app_friends_add', {id: u.id}) }}" method="post" style="margin:0;">
+                      <input type="hidden" name="_token" value="{{ csrf_token('friends' ~ u.id) }}">
+                      <button class="btn btn-primary" type="submit">➕ Ajouter</button>
+                    </form>
+                  {% endif %}
+                  {% if not isAccepted %}
+                    <form action="{{ path('app_friends_accept', {id: u.id}) }}" method="post" style="margin:0;">
+                      <input type="hidden" name="_token" value="{{ csrf_token('friends_accept' ~ u.id) }}">
+                      <button class="btn btn-secondary" type="submit">✅ Accepter (démo)</button>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% else %}
+            <tr><td colspan="5" style="padding:8px;">Aucun utilisateur.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

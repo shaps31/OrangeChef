@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}✏️ Modifier une recette{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="recipe-form-header" style="text-align:center;margin-bottom:24px;">
+    <h1>✏️ Modifier la recette</h1>
+    <p>Mettez à jour les informations de votre recette.</p>
+  </div>
+
+  <div class="recipe-form-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.08);padding:20px;">
+    {{ form_start(form, { attr: { class: 'recipe-form', novalidate: 'novalidate' } }) }}
+      {{ form_errors(form) }}
+      {{ form_widget(form) }}
+
+      <div class="form-actions" style="display:flex;gap:10px;margin-top:16px;">
+        <button type="submit" class="btn btn-primary">💾 Mettre à jour</button>
+        <a href="{{ path('app_recipe_show', { id: recipe.id }) }}" class="btn btn-secondary">Annuler</a>
+      </div>
+    {{ form_end(form) }}
+  </div>
+</div>
+{% endblock %}

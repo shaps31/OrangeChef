@@ -1,0 +1,70 @@
+home: Home
+email_page: Email Page
+target: Target
+recipes: Recipes
+list_of_oranges: List of Oranges
+search_color_placeholder: Search a color...
+users: Users
+register_link: No account yet?
+create_account: Create an account
+login: Login
+success_login: Login successful!
+register: Register
+success_register: Register successful!
+reset_password: Reset Password
+success_reset_password: Password reset successful!
+profile: My account
+edit_profile: Edit my profile
+change_password: Change my password
+email: Email
+name: Last Name
+first_name: First Name
+avatar: Avatar
+roles: Roles
+user: User
+admin: Admin
+password: Password
+confirm_password: Confirm password
+old_password: Old password
+new_password: New password
+submit: Submit
+remember_me: Remember me
+dashboard: Dashboard
+
+
+form:
+    nom: Last Name
+    prenom: First Name
+    email: Email
+    avatar: Avatar
+
+errors:
+    invalid_image_type: Please upload a valid image (JPEG, PNG, GIF)
+    min_width: Image is too small (min 80px)
+    max_width: Image is too large (max 2000px)
+    min_height: Image is too short (min 80px)
+    max_height: Image is too tall (max 2000px)
+
+role.admin: Admin
+role.user: User
+
+orange:
+  page_title: Orange Management
+  list_title: Orange List
+  add_button: Add a new orange
+  filter:
+    color: Color
+    name: Name
+    price_min: Minimum price
+    price_max: Maximum price
+    search_button: Search
+    reset_button: Reset
+    all_colors: -- All --
+  name: Name
+  color: Color
+  price: Price (€)
+  actions: Actions
+  view: View
+  edit: Edit
+  delete: Delete
+  no_result: No oranges match your search.

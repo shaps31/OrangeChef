@@ -1,0 +1,43 @@
+{# templates/_macros/media.html.twig #}
+{% macro image(src, alt, kind, w, h, extra) %}
+    {% set s = (src ?? '')|trim %}
+    {% set useAsset = false %}
+
+    {# 1) URLs absolues (# http/https) ou déjà /uploads/... -> on ne touche pas #}
+    {% if s starts with('http') or s starts with('/uploads/') %}
+        {% set web = s %}
+
+        {# 2) Chemins gérés par AssetMapper (avec OU sans / au début) #}
+    {% elseif s starts with('assets/') or s starts with('/assets/')
+        or s starts with('img/') or s starts with('/img/') %}
+        {# normalise vers un chemin logique (ex: "img/vedette.jpg") #}
+        {% set logical = s %}
+        {% if logical starts with('/') %}{% set logical = logical|slice(1) %}{% endif %}
+        {% if logical starts with('assets/') %}{% set logical = logical|slice(7) %}{% endif %}
+        {% set web = logical %}
+        {% set useAsset = true %}
+
+        {# 3) Chemins d’upload fournis sans / initial #}
+    {% elseif s starts with('uploads/') %}
+        {% set web = '/' ~ s %}
+
+        {# 4) Nom “nu” d’un fichier d’upload de recette -> /uploads/recipes/<fichier> #}
+    {% else %}
+        {% set web = '/uploads/recipes/' ~ s %}
+    {% endif %}
+
+    {% set url = useAsset ? asset(web) : web %}
+
+    <img
+        src="{{ url }}"
+        alt="{{ alt|default('')|e }}"
+        {% if w %}width="{{ w }}"{% endif %}
+        {% if h %}height="{{ h }}"{% endif %}
+        {% if kind == 'hero' %}
+            fetchpriority="high" loading="eager" decoding="async"
+        {% else %}
+            loading="lazy" decoding="async"
+        {% endif %}
+        class="{{ extra|default('') }}"
+    >
+{% endmacro %}

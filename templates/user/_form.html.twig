@@ -1,0 +1,57 @@
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{{ form_start(form, { attr: { class: 'needs-validation', novalidate: 'novalidate' } }) }}
+
+{% if form_errors(form) is not empty %}
+    <div class="alert alert-danger mb-3">
+        {{ form_errors(form) }}
+    </div>
+{% endif %}
+
+<div class="row g-3">
+    {% if form.displayName is defined %}
+        <div class="col-md-6">{{ form_row(form.displayName) }}</div>
+    {% endif %}
+
+    {% if form.email is defined %}
+        <div class="col-md-6">{{ form_row(form.email) }}</div>
+    {% endif %}
+
+    {% if form.avatar is defined %}
+        <div class="col-md-6">{{ form_row(form.avatar) }}</div>
+    {% endif %}
+
+    {% if form.roles is defined %}
+        <div class="col-md-6">{{ form_row(form.roles) }}</div>
+    {% endif %}
+
+    {% if form.isVerified is defined %}
+        <div class="col-md-6">{{ form_row(form.isVerified) }}</div>
+    {% endif %}
+
+    {% if form.plainPassword is defined %}
+        <div class="col-md-6">{{ form_row(form.plainPassword) }}</div>
+    {% endif %}
+
+    {% if form.newPassword is defined %}
+        <div class="col-md-6">{{ form_row(form.newPassword) }}</div>
+    {% endif %}
+
+    {# Fallback : rendre tout champ non listé ci-dessus #}
+    {% set _skip = ['displayName','email','avatar','roles','isVerified','plainPassword','newPassword','_token'] %}
+    {% for child in form %}
+        {% set _name = child.vars.name %}
+        {% if _name not in _skip %}
+            <div class="col-12">{{ form_row(child) }}</div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="d-flex justify-content-end gap-2 mt-3">
+    {% if cancel_path is defined %}
+        <a href="{{ cancel_path }}" class="btn btn-outline-secondary">Annuler</a>
+    {% endif %}
+    <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+</div>
+
+{{ form_end(form) }}

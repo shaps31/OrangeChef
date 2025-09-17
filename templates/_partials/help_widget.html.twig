@@ -1,0 +1,294 @@
+{# _partials/help_widget.html.twig #}
+
+{# ——— Mapping client de secours : transforme route:xxx -> URL localisée via Twig ——— #}
+<script>
+    window.OC_ROUTE_MAP = {
+        'route:app_recipe_index': '{{ path("app_recipe_index", {"_locale": app.request.locale}) }}',
+        'route:app_recipe_new': '{{ path("app_recipe_new", {"_locale": app.request.locale}) }}',
+        'route:app_my_recipes': '{{ path("app_my_recipes", {"_locale": app.request.locale}) }}',
+        'route:app_friends': '{{ path("app_friends", {"_locale": app.request.locale}) }}',
+        'route:app_inventory_index': '{{ path("app_inventory_index", {"_locale": app.request.locale}) }}',
+        'route:app_inventory_new': '{{ path("app_inventory_new", {"_locale": app.request.locale}) }}',
+        'route:app_inventory_alerts': '{{ path("app_inventory_alerts", {"_locale": app.request.locale}) }}',
+        'route:app_profil': '{{ path("app_profil", {"_locale": app.request.locale}) }}',
+        'route:app_change_password': '{{ path("app_change_password", {"_locale": app.request.locale}) }}',
+        'route:app_dashboard': '{{ path("app_dashboard", {"_locale": app.request.locale}) }}',
+        'route:app_contact': '{{ path("app_contact", {"_locale": app.request.locale}) }}'
+    };
+    // Optionnel: expose aussi l'URL du KB si tu externalises le JS
+    window.HELP_KB_URL = '{{ path("help_kb", {"_locale": app.request.locale}) }}';
+</script>
+
+<style>
+    :root{ --oc-accent:#ff9800; --oc-accent-600:#fb8c00; --oc-bg:#fff; --oc-text:#1f2937; --oc-muted:#6b7280; --oc-chip:#f3f4f6; --oc-chip-active:#ffe0b2; --oc-shadow:0 12px 28px rgba(0,0,0,.25); --oc-ring:0 0 0 3px rgba(255,152,0,.15); }
+    @media (prefers-color-scheme: dark){
+        :root{ --oc-bg:#0f1115; --oc-text:#e5e7eb; --oc-muted:#9ca3af; --oc-chip:#1f2937; --oc-chip-active:#4b5563; --oc-shadow:0 20px 40px rgba(0,0,0,.6); --oc-ring:0 0 0 3px rgba(255,152,0,.25); }
+    }
+    .oc-help-btn{ position:fixed; right:18px; bottom:18px; width:56px; height:56px; border-radius:50%; background:var(--oc-accent); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px rgba(0,0,0,.25); cursor:pointer; z-index:9999; border:none; font-size:22px; }
+    .oc-help-btn:hover{ filter:brightness(1.05); }
+    .oc-help-btn:focus-visible{ outline:none; box-shadow:var(--oc-ring); }
+    .oc-help-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:9998; backdrop-filter:saturate(120%) blur(1px); }
+    .oc-help-panel{ position:fixed; right:18px; bottom:86px; width:360px; max-height:72vh; min-width:320px; min-height:320px; background:var(--oc-bg); color:var(--oc-text); border-radius:14px; overflow:hidden; box-shadow:var(--oc-shadow); display:none; flex-direction:column; z-index:9999; border:1px solid rgba(0,0,0,.05); resize:both; }
+    .oc-mode-wide{ width:520px!important; max-height:82vh!important; }
+    .oc-mode-full{ inset:5vh 5vw!important; width:auto!important; height:auto!important; max-height:none!important; }
+    body.oc-help-open{ overflow:hidden; }
+    .oc-help-header{ background:var(--oc-accent); color:#fff; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .oc-help-title{ display:flex; align-items:center; gap:8px; font-weight:700; }
+    .oc-help-badge{ background:rgba(255,255,255,.2); padding:.2rem .5rem; border-radius:999px; font-size:12px; }
+    .oc-help-actions-head{ display:flex; gap:6px; }
+    .oc-help-x,.oc-help-mode{ background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer; padding:4px 6px; border-radius:8px; }
+    .oc-help-x:focus-visible,.oc-help-mode:focus-visible{ outline:none; box-shadow:var(--oc-ring); }
+    .oc-help-body{ padding:12px; display:flex; gap:10px; flex-direction:column; height:100%; }
+    .oc-help-desc{ margin:0; color:var(--oc-muted); font-size:13px; line-height:1.45; }
+    .oc-help-search{ display:flex; gap:8px; align-items:center; }
+    .oc-help-input{ flex:1; padding:10px 12px; border:1.5px solid #e5e7eb; border-radius:10px; outline:none; background:transparent; color:inherit; }
+    .oc-help-input::placeholder{ color:var(--oc-muted); }
+    .oc-help-input:focus{ border-color:var(--oc-accent); box-shadow:var(--oc-ring); }
+    .oc-help-clear{ padding:10px 12px; border-radius:10px; border:1.5px solid #e5e7eb; background:var(--oc-chip); color:var(--oc-text); cursor:pointer; }
+    .oc-help-clear:hover{ background:#eceff1; }
+    .oc-help-cats{ display:flex; gap:6px; flex-wrap:wrap; }
+    .oc-help-cat{ padding:6px 10px; border-radius:999px; background:var(--oc-chip); cursor:pointer; font-size:12px; border:1px solid rgba(0,0,0,.06); }
+    .oc-help-cat.active{ background:var(--oc-chip-active); color:#111827; }
+    .oc-help-cat:focus-visible{ outline:none; box-shadow:var(--oc-ring); }
+    .oc-help-list{ display:flex; flex-direction:column; gap:8px; overflow:auto; flex:1; }
+    .oc-help-item{ display:flex; gap:10px; align-items:flex-start; background:rgba(127,127,127,.06); padding:12px; border-radius:10px; border:1px solid rgba(0,0,0,.05); line-height:1.55; }
+    .oc-help-item .ic{ font-size:18px; }
+    .oc-help-item h4{ margin:0 0 6px; font-size:15px; line-height:1.35; }
+    .oc-help-item .muted{ color:var(--oc-muted); font-size:12px; margin:2px 0 6px; }
+    .oc-help-ans{ font-size:14px; }
+    .oc-help-ans.clamp{ display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+    .oc-more{ background:transparent; border:none; color:var(--oc-accent-600); cursor:pointer; padding:0; margin-left:6px; font-weight:600; }
+    .oc-help-footer{ padding:10px 12px; display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid rgba(0,0,0,.06); }
+    .oc-help-link{ display:inline-flex; align-items:center; gap:6px; padding:8px 10px; border-radius:8px; background:var(--oc-chip); color:inherit; text-decoration:none; border:1px solid rgba(0,0,0,.06); }
+    .oc-help-link:hover{ background:#eceff1; }
+    mark{ background:#fff3cd; color:inherit; padding:0 .15em; border-radius:3px; }
+    @media (max-width:480px){ .oc-help-panel{ right:10px; left:10px; width:auto; bottom:10px; max-height:calc(100vh - 20px); } }
+    @media (max-width:420px){ .oc-help-panel{ inset:10px; width:auto; bottom:auto; } }
+    @media (prefers-reduced-motion:no-preference){ .oc-help-panel[data-animate="in"]{ animation: ocPop .16s ease-out both; } @keyframes ocPop{ from{ transform:translateY(6px) scale(.98); opacity:.0 } to{ transform:none; opacity:1 } } }
+</style>
+
+<button id="ocHelpBtn" class="oc-help-btn" aria-label="Ouvrir l’aide" aria-controls="ocHelpPanel" aria-expanded="false" type="button">❓</button>
+<div id="ocHelpOverlay" class="oc-help-overlay" tabindex="-1" aria-hidden="true"></div>
+
+<div id="ocHelpPanel" class="oc-help-panel" role="dialog" aria-modal="true" aria-labelledby="ocHelpTitle" aria-describedby="ocHelpDesc">
+    <div class="oc-help-header">
+        <div class="oc-help-title">
+            <span aria-hidden="true">🍊</span>
+            <strong id="ocHelpTitle">Assistance Orange Chef</strong>
+            <span class="oc-help-badge" id="ocHelpCount" aria-live="polite">0 résultat</span>
+        </div>
+        <div class="oc-help-actions-head">
+            <button id="ocHelpMode" class="oc-help-mode" type="button" title="Changer la taille (Compact → Large → Plein écran)" aria-label="Changer la taille">⛶</button>
+            <button id="ocHelpClose" class="oc-help-x" type="button" aria-label="Fermer l’aide">✖</button>
+        </div>
+    </div>
+
+    <div class="oc-help-body">
+        <p id="ocHelpDesc" class="oc-help-desc">Tapez un mot-clé (ex : « recette », « amis », « contact ») ou filtrez par catégorie.</p>
+        <div class="oc-help-search">
+            <input id="ocHelpQuery" class="oc-help-input" type="search" placeholder="Rechercher une aide…" autocomplete="off" enterkeyhint="search">
+            <button id="ocHelpClear" class="oc-help-clear" type="button" aria-label="Effacer la recherche">Effacer</button>
+        </div>
+        <div id="ocHelpCats" class="oc-help-cats" role="tablist" aria-label="Catégories d’aide"></div>
+        <div id="ocHelpList" class="oc-help-list" aria-live="polite"></div>
+    </div>
+
+    <div class="oc-help-footer">
+        <a class="oc-help-link" href="{{ path('app_recipe_index') }}">🍊 Recettes</a>
+        <a class="oc-help-link" href="{{ path('app_my_recipes') }}">📝 Ma recette</a>
+        <a class="oc-help-link" href="{{ path('app_friends') }}">👥 Amis</a>
+        <a class="oc-help-link" href="{{ path('app_contact') }}">✉️ Contact</a>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const $ = (s)=>document.querySelector(s);
+        const btn=$('#ocHelpBtn'), panel=$('#ocHelpPanel'), close=$('#ocHelpClose'), list=$('#ocHelpList'),
+            cats=$('#ocHelpCats'), query=$('#ocHelpQuery'), clear=$('#ocHelpClear'),
+            badge=$('#ocHelpCount'), overlay=$('#ocHelpOverlay'), modeBtn=$('#ocHelpMode');
+
+        if(!btn||!panel||!list) return;
+
+        let KB={categories:[]}, currentCat='all', lastFocus=null;
+
+        /* Utils */
+        const escapeHtml=(s='')=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+        const plural=(n,a,b)=>n>1?b:a;
+        const debounce=(fn,ms=160)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms);} };
+        const highlight=(txt,q)=>{ if(!q) return escapeHtml(txt); try{ const rx=new RegExp('('+q.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\$&')+')','ig'); return escapeHtml(txt).replace(rx,'<mark>$1</mark>'); }catch{ return escapeHtml(txt); } };
+
+        // Préfixe auto par locale pour chemins relatifs
+        function getCurrentLocalePrefix(){
+            const htmlLang=(document.documentElement.getAttribute('lang')||'').split('-')[0];
+            if(/^[a-z]{2}$/i.test(htmlLang)) return '/'+htmlLang;
+            const seg=(location.pathname.split('/').filter(Boolean)[0]||'');
+            return /^[a-z]{2}$/i.test(seg)? '/'+seg : '';
+        }
+        function resolveHref(raw){
+            if(!raw) return null;
+            if (raw.startsWith('route:')) {
+                const m = (window.OC_ROUTE_MAP || {})[raw];
+                return m || null; // pas de lien cassé si non mappé
+            }
+            if (/^(https?:)?\/\//i.test(raw) || raw.startsWith('mailto:') || raw.startsWith('tel:')) return raw;
+            const loc = getCurrentLocalePrefix();
+            const p = raw.startsWith('/') ? raw : '/' + raw;
+            return (loc && !p.startsWith(loc + '/')) ? (loc + p) : p;
+        }
+
+        /* Modes */
+        const MODES=['docked','wide','full'];
+        function applyMode(mode){
+            panel.classList.remove('oc-mode-wide','oc-mode-full');
+            if(mode==='wide') panel.classList.add('oc-mode-wide');
+            if(mode==='full') panel.classList.add('oc-mode-full');
+            localStorage.setItem('ocHelpMode',mode);
+        }
+        function cycleMode(){
+            const cur=localStorage.getItem('ocHelpMode')||'docked';
+            const next=MODES[(MODES.indexOf(cur)+1)%MODES.length];
+            applyMode(next);
+        }
+        modeBtn.addEventListener('click',cycleMode);
+
+        /* Open/Close + focus + raccourci ? */
+        function openPanel(){
+            if(panel.style.display==='flex') return;
+            panel.style.display='flex'; panel.dataset.animate='in';
+            overlay.style.display='block'; document.body.classList.add('oc-help-open');
+            btn.setAttribute('aria-expanded','true');
+            lastFocus=document.activeElement; setTimeout(()=>query?.focus(),0);
+            localStorage.setItem('ocHelpOpen','1');
+            applyMode(localStorage.getItem('ocHelpMode')||'docked');
+        }
+        function closePanel(){
+            if(panel.style.display==='none') return;
+            panel.style.display='none'; overlay.style.display='none';
+            document.body.classList.remove('oc-help-open');
+            btn.setAttribute('aria-expanded','false');
+            lastFocus?.focus?.();
+            localStorage.removeItem('ocHelpOpen');
+        }
+        btn.addEventListener('click',openPanel);
+        close.addEventListener('click',closePanel);
+        overlay.addEventListener('click',closePanel);
+        document.addEventListener('keydown',(e)=>{
+            if(panel.style.display==='flex' && e.key==='Escape') closePanel();
+            if(panel.style.display==='flex' && e.key==='Tab') trapFocus(e);
+            if(e.key==='?' && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); (panel.style.display==='flex'?closePanel:openPanel)(); }
+        });
+        function trapFocus(e){
+            const f=panel.querySelectorAll('button,[href],input,[tabindex]:not([tabindex="-1"])');
+            if(!f.length) return;
+            const first=f[0], last=f[f.length-1];
+            if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
+            else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
+        }
+
+        /* Catégories */
+        function renderCats(){
+            const items=[{id:'all',label:'Tout'}].concat((KB.categories||[]).map(c=>({id:c.id,label:c.label})));
+            cats.innerHTML=items.map(c=>{
+                const active=c.id===currentCat?'active':'';
+                return `<button class="oc-help-cat ${active}" role="tab" aria-selected="${active?'true':'false'}" data-id="${escapeHtml(c.id)}" type="button">${escapeHtml(c.label)}</button>`;
+            }).join('');
+            cats.querySelectorAll('.oc-help-cat').forEach(el=>{
+                el.addEventListener('click',()=>{
+                    currentCat=el.dataset.id; render();
+                    cats.querySelectorAll('.oc-help-cat').forEach(b=>{ const on=b===el; b.classList.toggle('active',on); b.setAttribute('aria-selected',on?'true':'false'); });
+                });
+                el.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el.click(); } });
+            });
+        }
+
+        /* Items + filtre */
+        function collectItems(){
+            const pools=currentCat==='all'?(KB.categories||[]):(KB.categories||[]).filter(c=>c.id===currentCat);
+            const items=[]; pools.forEach(c=>(c.items||[]).forEach(it=>items.push({cat:c.label,q:it.q||'',a:it.a||'',href:it.href||null})));
+            return items;
+        }
+        function filterItems(items){
+            const q=(query.value||'').toLowerCase().trim(); if(!q) return items;
+            return items.filter(it=>(it.q||'').toLowerCase().includes(q)||(it.a||'').toLowerCase().includes(q)||(it.cat||'').toLowerCase().includes(q));
+        }
+        function bindExpanders(){
+            list.querySelectorAll('.oc-more').forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    const ans=btn.closest('.oc-help-item').querySelector('.oc-help-ans');
+                    const expanded=ans.getAttribute('data-expanded')==='1';
+                    ans.classList.toggle('clamp',expanded);
+                    ans.setAttribute('data-expanded',expanded?'0':'1');
+                    btn.textContent=expanded?'Afficher tout':'Réduire';
+                });
+            });
+        }
+
+        function render(){
+            const all=collectItems(); const items=filterItems(all); const count=items.length;
+            badge.textContent=`${count} ${plural(count,'résultat','résultats')}`;
+            if(count===0){
+                list.innerHTML=`<div class="oc-help-item"><div class="ic" aria-hidden="true">🧐</div><div><h4>Aucun résultat</h4><div class="muted">Essayez un autre mot-clé ou une autre catégorie.</div></div></div>`;
+                return;
+            }
+            const q=(query.value||'').trim();
+            list.innerHTML=items.map(it=>{
+                const title=highlight(it.q,q);
+                const bodyRaw=it.a||'';
+                const bodyShort=bodyRaw.length>240? bodyRaw.slice(0,240)+'…' : bodyRaw;
+                const bodyHtml=(q?highlight(bodyShort,q):escapeHtml(bodyShort));
+                const cat=escapeHtml(it.cat||'');
+                const needsMore=bodyRaw.length>240;
+                const hrefFinal = it.href ? resolveHref(it.href) : null;
+                const cta = hrefFinal ? `<div style="margin-top:8px"><a class="oc-help-link" href="${escapeHtml(hrefFinal)}" rel="nofollow">Ouvrir</a></div>` : '';
+                return `<article class="oc-help-item" role="article">
+        <div class="ic" aria-hidden="true">💡</div>
+        <div>
+          <h4>${title}</h4>
+          <div class="muted">${cat}</div>
+          <div class="oc-help-ans clamp" data-expanded="0">
+            ${bodyHtml}${needsMore ? ` <button class="oc-more" type="button">Afficher tout</button>` : ''}
+          </div>
+          ${cta}
+        </div>
+      </article>`;
+            }).join('');
+            bindExpanders();
+        }
+
+        const renderDebounced=debounce(render,160);
+        query.addEventListener('input',renderDebounced);
+        clear.addEventListener('click',()=>{ query.value=''; query.focus(); render(); });
+
+        /* Data */
+        const url = (typeof window.HELP_KB_URL === 'string' && window.HELP_KB_URL)
+            ? window.HELP_KB_URL
+            : '{{ path("help_kb", {"_locale": app.request.locale}) }}';
+
+        fetch(url, { cache:'no-store' })
+            .then(r=>r.ok? r.json() : Promise.reject())
+            .then(data=>{
+                // Normalisation client : route:xxx -> URL via OC_ROUTE_MAP (ceinture + bretelles)
+                if (data && Array.isArray(data.categories)) {
+                    const map = window.OC_ROUTE_MAP || {};
+                    data.categories.forEach(c=>{
+                        (c.items || []).forEach(it=>{
+                            if (it && typeof it.href === 'string' && it.href.startsWith('route:')) {
+                                it.href = map[it.href] || null; // si non mappé → pas de bouton "Ouvrir"
+                            }
+                        });
+                    });
+                }
+
+                KB = data || {categories:[]};
+                if (KB.categories?.sort) { KB.categories.sort((a,b)=>(a.label||'').localeCompare(b.label||'')); }
+                renderCats(); render();
+                if(localStorage.getItem('ocHelpOpen')==='1'){ openPanel(); }
+                applyMode(localStorage.getItem('ocHelpMode')||'docked');
+            })
+            .catch(()=>{
+                KB={categories:[{id:'gen',label:'Général',items:[{q:'Bienvenue',a:"Utilisez la recherche pour trouver de l’aide."}]}]};
+                renderCats(); render();
+            });
+    })();
+</script>

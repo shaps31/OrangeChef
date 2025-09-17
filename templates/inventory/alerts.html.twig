@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Alertes d'expiration{% endblock %}
+
+{% block body %}
+  <h1>⏰ Alertes d'expiration</h1>
+
+  <h2>À surveiller</h2>
+  {% if expiringSoon is empty %}
+    <p>Aucune orange proche d'expiration.</p>
+  {% else %}
+    <ul>
+      {% for i in expiringSoon %}
+        <li>{{ i.variety }} — {{ i.quantity }} ({{ i.expirationDate|date('d/m/Y') }})</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <h2>Périmées</h2>
+  {% if expired is empty %}
+    <p>Aucune orange périmée.</p>
+  {% else %}
+    <ul>
+      {% for i in expired %}
+        <li>{{ i.variety }} — {{ i.quantity }} ({{ i.expirationDate|date('d/m/Y') }})</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <p><a href="{{ path('app_inventory_index') }}">← Retour à l'inventaire</a></p>
+{% endblock %}

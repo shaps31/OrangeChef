@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mes favoris - Orange Chef{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>❤️ Mes recettes favorites</h1>
+
+        {% if items is empty %}
+            <p class="muted">Aucune recette en favori pour le moment.</p>
+            <a class="btn btn-primary" href="{{ path('app_recipe_index') }}">Parcourir les recettes</a>
+        {% else %}
+            <div class="teaser-grid">
+                {% for fav in items %}
+                    {% set r = fav.recipe %}
+                    <article class="teaser-card">
+                        <a class="teaser-thumb" href="{{ path('app_recipe_show', {id: r.id}) }}">
+                            {% set img = r.image ? 'uploads/recipes/' ~ r.image : 'img/placeholder-recipe.jpg' %}
+                            <img src="{{ asset(img) }}" alt="{{ r.title }}" class="rounded">
+                        </a>
+                        <div class="teaser-content">
+                            <h3 class="teaser-title"><a href="{{ path('app_recipe_show', {id: r.id}) }}">{{ r.title }}</a></h3>
+                            <p class="teaser-excerpt">{{ (r.description|striptags)|u.truncate(110, '…') }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

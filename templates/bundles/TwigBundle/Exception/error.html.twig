@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+{% block title %}Oups — Orange Chef{% endblock %}
+
+{% block body %}
+    <div class="container" style="max-width:880px;margin:0 auto">
+        <section class="surface rounded shadow" style="padding:28px">
+            <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+                <div style="font-size:52px">🍊</div>
+                <div>
+                    <h1 style="margin:0 0 6px">Petit pépin</h1>
+                    <p class="muted" style="margin:0 0 12px">
+                        Un problème est survenu. Essaie de revenir à l’accueil ou d’ouvrir les recettes.
+                    </p>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <a class="btn btn-primary" href="{{ path('app_home') }}">🏠 Accueil</a>
+                        <a class="btn btn-secondary" href="{{ path('app_recipe_index') }}">🍊 Voir les recettes</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block body %}
+    {# -- Calcul d'un libellé de rôle binaire : Admin ou User -- #}
+    {% set roleLabel = is_granted('ROLE_ADMIN') ? 'Admin' : 'User' %}
+
+    <div class="container">
+        <div class="profile">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="avatar-wrap">
+                        {% if app.user.avatar %}
+                            <img id="avatar-preview" src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}?v={{ 'now'|date('U') }}" alt="Avatar">
+                        {% else %}
+                            <div class="avatar-placeholder">{{ app.user.prenom|first|upper ~ app.user.nom|first|upper }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="identity">
+                        <h1>👤 {{ app.user.prenom }} {{ app.user.nom }}</h1>
+                        <div class="badges">
+                            <span class="badge role">{{ roleLabel }}</span>
+                            {% if app.user.isVerified is defined and app.user.isVerified %}
+                                <span class="badge verified">✔️ Email vérifié</span>
+                            {% endif %}
+                        </div>
+                        <div class="contact">
+                            <span class="email">📧 {{ app.user.email }}</span>
+                            <button class="btn btn-secondary btn-small" id="copyEmail" data-email="{{ app.user.email }}">Copier</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <a href="{{ path('app_profil_edit') }}" class="btn">✏️ Modifier mon profil</a>
+                    <a href="{{ path('app_change_password') }}" class="btn btn-secondary">🔐 Changer le mot de passe</a>
+                    <a href="{{ path('app_my_recipes') }}" class="btn btn-outline">📝 Mes recettes</a>
+                    <a href="{{ path('app_inventory_index') }}" class="btn btn-outline">🍊 Mon stock</a>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail"><span class="label">Email</span><span class="value">{{ app.user.email }}</span></div>
+                    <div class="detail"><span class="label">Nom</span><span class="value">{{ app.user.nom }}</span></div>
+                    <div class="detail"><span class="label">Prénom</span><span class="value">{{ app.user.prenom }}</span></div>
+                    <div class="detail"><span class="label">Rôle</span><span class="value">{{ roleLabel }}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .profile { display:flex; justify-content:center; }
+        .profile-card { width:100%; max-width: 960px; background:#fff; border-radius:16px; box-shadow:0 6px 24px rgba(0,0,0,.08); padding:22px; }
+        .profile-header { display:flex; gap:18px; align-items:center; }
+        .avatar-wrap { width:110px; height:110px; border-radius:50%; overflow:hidden; border: 3px solid #ff9800; box-shadow:0 4px 14px rgba(255,152,0,.25); background:#fff; display:flex; align-items:center; justify-content:center; }
+        .avatar-wrap img { width:100%; height:100%; object-fit:cover; }
+        .avatar-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ff9800,#f57c00); color:#fff; font-weight:700; font-size: 32px; }
+        .identity h1 { margin:0 0 6px; font-size:1.6rem; color:#333; }
+        .badges { display:flex; gap:8px; margin:6px 0 10px; }
+        .badge { background:#fff; border:1px solid #eee; padding:4px 10px; border-radius:999px; font-size:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .badge.role { color:#ff9800; border-color:#ffd699; background:#fffaf2; }
+        .badge.verified { color:#2e7d32; border-color:#a5d6a7; background:#f1fbf2; }
+        .contact { display:flex; gap:8px; align-items:center; color:#555; }
+
+        .profile-actions { display:flex; flex-wrap:wrap; gap:10px; margin:18px 0 6px; }
+        .btn { background: linear-gradient(135deg, #ff9800, #f57c00); color:#fff; padding:10px 14px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+        .btn-secondary { background:#fff; color:#ff9800; border:2px solid #ff9800; }
+        .btn-secondary:hover { background:#ff9800; color:#fff; }
+        .btn-outline { background:transparent; color:#ff9800; border:2px dashed #ff9800; }
+        .btn-small { padding:6px 10px; font-size: 13px; }
+
+        .profile-details { margin-top:12px; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:10px; }
+        .detail { background:#fffaf2; border:1px solid #ffe0b2; border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; }
+        .detail .label { color:#a66a00; font-weight:600; }
+        .detail .value { color:#333; }
+
+        @media (max-width: 640px) {
+            .profile-header { align-items:flex-start; }
+        }
+    </style>
+
+    <script>
+        (function(){
+            const btn = document.getElementById('copyEmail');
+            btn?.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(btn.dataset.email);
+                    btn.textContent = 'Copié !';
+                    setTimeout(() => btn.textContent = 'Copier', 1400);
+                } catch (e) {}
+            });
+        })();
+    </script>
+{% endblock %}

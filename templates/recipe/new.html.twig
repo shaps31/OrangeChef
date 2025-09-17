@@ -1,0 +1,257 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Recette - Orange Chef{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="recipe-form-header">
+        <h1>🍊Créer une nouvelle recette</h1>
+        <p>Partagez votre création culinaire avec la communauté Orange Chef !</p>
+    </div>
+
+    {{ form_start(form, {'attr': {'class': 'recipe-form', 'enctype': 'multipart/form-data'}}) }}
+        
+        <div class="form-section">
+            <h3>📝 Informations générales</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title) }}
+                    {{ form_errors(form.title) }}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                    {{ form_errors(form.description) }}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    {{ form_label(form.category) }}
+                    {{ form_widget(form.category) }}
+                    {{ form_errors(form.category) }}
+                </div>
+                <div class="form-group half">
+                    {{ form_label(form.difficulty) }}
+                    {{ form_widget(form.difficulty) }}
+                    {{ form_errors(form.difficulty) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>⏱️Temps et portions</h3>
+            <div class="form-row">
+                <div class="form-group third">
+                    {{ form_label(form.preparationTime) }}
+                    {{ form_widget(form.preparationTime) }}
+                    {{ form_errors(form.preparationTime) }}
+                </div>
+                <div class="form-group third">
+                    {{ form_label(form.cookingTime) }}
+                    {{ form_widget(form.cookingTime) }}
+                    {{ form_errors(form.cookingTime) }}
+                </div>
+                <div class="form-group third">
+                    {{ form_label(form.servings) }}
+                    {{ form_widget(form.servings) }}
+                    {{ form_errors(form.servings) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>🥄Ingrédients et préparation</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.ingredients) }}
+                    {{ form_widget(form.ingredients) }}
+                    {{ form_errors(form.ingredients) }}
+                    <small class="form-help">Listez chaque ingrédient sur une ligne séparée</small>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.instructions) }}
+                    {{ form_widget(form.instructions) }}
+                    {{ form_errors(form.instructions) }}
+                    <small class="form-help">Numérotez chaque étape pour plus de clarté</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>📸Photo et visibilité</h3>      
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.imageFile) }}
+                    {{ form_widget(form.imageFile) }}
+                    {{ form_errors(form.imageFile) }}
+                    <small class="form-help">Format accepté: JPEG, PNG, WebP (max 5MB)</small>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group checkbox-group">
+                    {{ form_widget(form.isPublic) }}
+                    {{ form_label(form.isPublic) }}
+                    {{ form_errors(form.isPublic) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">  
+                <span class="loading-spinner" style="display: none;"></span>
+                🍊Publier ma recette
+            </button>
+            <a href="{{ path('app_recipe_index') }}" class="btn btn-secondary">Annuler</a>
+        </div>
+
+    {{ form_end(form) }}
+</div>
+
+<style>
+.recipe-form-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.recipe-form-header h1 {
+    color: #ff9800;
+    font-size: 2.2em;
+    margin-bottom: 10px;
+}
+
+.recipe-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.form-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff9800, #f57c00);
+    border-radius: 12px 12px 0 0;
+}
+
+.form-section h3 {
+    color: #ff9800;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    border-bottom: 2px solid #fff3e0;
+    padding-bottom: 10px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
+}
+
+.form-group {
+    flex: 1;
+}
+
+.form-group.half {
+    flex: 0 0 calc(50% - 10px);
+}
+
+.form-group.third {
+    flex: 0 0 calc(33.333% - 14px);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-help {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.form-actions {
+    text-align: center;
+    padding: 30px 0;
+}
+
+.form-actions .btn {
+    margin: 0 10px;
+    min-width: 150px;
+}
+
+/* Animation pour le bouton de soumission */
+.btn-primary:active .loading-spinner {
+    display: inline-block !important;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-group.half,
+    .form-group.third {
+        flex: 1;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.recipe-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const spinner = submitBtn.querySelector('.loading-spinner');
+    
+    form.addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        spinner.style.display = 'inline-block';
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Publication en cours...';
+    });
+});
+</script>
+{% endblock %}

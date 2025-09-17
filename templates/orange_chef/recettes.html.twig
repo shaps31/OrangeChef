@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos Recettes{% endblock %}
+
+{% block body %}
+<div class="example-wrapper">
+    <h1>🍊 Recettes à base d’oranges</h1>
+
+    <p class="accroche">Découvrez nos idées savoureuses à base d’oranges fraîches !</p>
+
+    <ul style="list-style: none; padding-left: 0;">
+        <li>🍰 Gâteau moelleux à l’orange</li>
+        <li>🍹 Jus d’orange maison</li>
+        <li>🥗 Salade vitaminée à l’orange</li>
+        <li>🍗 Poulet sauce orange</li>
+    </ul>
+
+    <a href="{{ path('app_home') }}" class="btn-recette">⬅ Retour à l’accueil</a>
+</div>
+{% endblock %}

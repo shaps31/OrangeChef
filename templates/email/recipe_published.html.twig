@@ -1,0 +1,15 @@
+{% extends 'email/_layout.html.twig' %}
+{% set subject = subject|default('🍊 Recette publiée !') %}
+
+{% block content %}
+    <h2 style="margin:0 0 12px;">🍊 Bonjour {{ userName|default('chef') }}</h2>
+    <p>Votre recette <strong>“{{ title }}”</strong> est maintenant en ligne.</p>
+
+    {% if url %}
+        <p style="margin-top:18px;">
+            <a href="{{ url }}" style="display:inline-block;padding:10px 16px;border-radius:8px;background:#ff7a00;color:#fff;text-decoration:none;">
+                Voir la recette
+            </a>
+        </p>
+    {% endif %}
+{% endblock %}

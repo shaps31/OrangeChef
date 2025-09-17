@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+{% block title %}Erreur interne (500) — Orange Chef{% endblock %}
+
+{% block body %}
+    <div class="container" style="max-width:880px;margin:0 auto">
+        <section class="surface rounded shadow" style="padding:28px">
+            <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+                <div style="font-size:52px">🥴</div>
+                <div>
+                    <h1 style="margin:0 0 6px">On a pressé l’orange un peu trop fort…</h1>
+                    <h1>💥 Une erreur est survenue</h1>
+                    <p class="muted" style="margin:0 0 12px">
+                        Une erreur est survenue. Réessaie dans un instant ou contacte-nous si le souci persiste.
+                    </p>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <a class="btn btn-primary" href="{{ path('app_home') }}">🏠 Accueil</a>
+                        <a class="btn btn-secondary" href="{{ path('app_recipe_index') }}">🍊 Voir les recettes</a>
+                        <a class="btn btn-outline" href="{{ path('app_contact') }}">✉️ Nous contacter</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

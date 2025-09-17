@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% import '_macros/media.html.twig' as media %}
+
+{% block title %}❤️ Mes favoris - Orange Chef{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>❤️ Mes favoris</h1>
+
+
+        {% if favorites is empty %}
+            <p class="muted">Aucun favori pour l’instant. Ajoute ta première recette ❤️</p>
+            <a class="btn btn-primary" href="{{ path('app_recipe_index', {'_locale': app.request.locale}) }}">Découvrir les recettes</a>
+        {% else %}
+            <div class="teaser-grid" style="display:grid;grid-template-columns:repeat(12,1fr);gap:18px;">
+                {% for f in favorites %}
+                    {% set r = f.recipe %}
+                    <article class="teaser-card" style="grid-column:span 4;display:flex;flex-direction:column;gap:10px;">
+                        <a href="{{ path('app_recipe_show', { id: r.id, '_locale': app.request.locale }) }}" class="teaser-thumb" aria-label="{{ r.titre ?? r.title }}">
+                            {{ media.image(
+                                r.image ? ('uploads/recipes/' ~ r.image) : 'img/placeholder-recipe.jpg',
+                            r.titre ?? r.title,
+                            'card',
+                            480, 320,
+                            'card-img-top rounded'
+                            ) }}
+                        </a>
+
+                        <div class="teaser-content">
+                            <h3 class="teaser-title" style="margin:0 0 6px;font-size:1.05rem;">
+                                <a href="{{ path('app_recipe_show', { id: r.id, '_locale': app.request.locale }) }}">{{ r.titre ?? r.title }}</a>
+                            </h3>
+                            {% if r.description %}
+                                <p class="teaser-excerpt" style="margin:0;color:#5b6270;">
+                                    {{ (r.resume ?? r.description)|striptags|u.truncate(110, '…') }}
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <div class="teaser-meta" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+                            <form method="post" action="{{ path('app_favorite_toggle', { id: r.id, '_locale': app.request.locale }) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('fav_' ~ r.id) }}">
+                                <button class="btn btn-secondary btn-sm">💔 Retirer</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
