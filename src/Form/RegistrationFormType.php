@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\File;
 
 class RegistrationFormType extends AbstractType
 {
@@ -44,9 +45,17 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('avatar', FileType::class, [
-                'label' => 'Avatar (image JPG/PNG)',
+                'label' => 'Avatar (facultatif)',
                 'mapped' => false,
                 'required' => false,
+                'help' => 'JPEG, PNG ou WEBP — 2 Mo max.',
+                'constraints' => [
+                    new File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => ['image/jpeg','image/png','image/webp'],
+                        'mimeTypesMessage' => "Format d'image non pris en charge.",
+                    ]),
+                ],
             ])
             ->add('roles', ChoiceType::class, [
                 'label' => 'Rôle',
