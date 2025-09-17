@@ -1,9 +1,10 @@
 <?php
+
 namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -17,14 +18,21 @@ final class HelpKbController
     #[Route('/help/kb.json', name: 'help_kb', methods: ['GET'])]
     public function __invoke(Request $request): Response
     {
-        $jsonPath = $this->kernel->getProjectDir().'/public/help_kb.json';
+        // 1) Fichier KB attendu
+        $jsonPath = $this->kernel->getProjectDir() . '/public/help_kb.json';
 
-        // Fallback minimal
-        $data = ['categories' => [[
-            'id' => 'gen', 'label' => 'Général',
-            'items' => [['q' => 'Bienvenue', 'a' => "Utilisez la recherche pour trouver de l’aide."]],
-        ]]];
+        // 2) Données par défaut (si le fichier n'existe pas)
+        $data = [
+            'categories' => [[
+                'id' => 'gen',
+                'label' => 'Général',
+                'items' => [
+                    ['q' => 'Bienvenue', 'a' => "Utilisez la recherche pour trouver de l’aide."]
+                ],
+            ]],
+        ];
 
+        // 3) Si le fichier est présent et lisible, on tente de le lire
         if (is_file($jsonPath) && is_readable($jsonPath)) {
             try {
                 $raw = file_get_contents($jsonPath) ?: '';
@@ -32,50 +40,65 @@ final class HelpKbController
                 if (is_array($decoded) && isset($decoded['categories'])) {
                     $data = $decoded;
                 }
-            } catch (\Throwable) { /* fallback */ }
+            } catch (\Throwable) {
+                // on garde le fallback en cas d'erreur de JSON
+            }
         }
 
+        // 4) Préfixe de langue simple: /fr, /en, etc. (on ignore fr_FR)
         $locale = (string) $request->getLocale();
-        $prefix = preg_match('~^[a-z]{2}$~i', $locale) ? '/'.$locale : '';
+        $prefix = (strlen($locale) === 2) ? '/' . $locale : '';
 
-        // Normalisation des href (sans métas)
-        foreach ($data['categories'] ?? [] as &$cat) {
-            foreach ($cat['items'] ?? [] as &$it) {
-                $href = $it['href'] ?? null;
-                if (!is_string($href) || $href === '') { unset($it['href']); continue; }
+        // 5) Normaliser les href des items (internes, externes, routes)
+        foreach ($data['categories'] ?? [] as &$category) {
+            foreach ($category['items'] ?? [] as &$item) {
+                $href = $item['href'] ?? null;
 
+                // pas d'href → on supprime juste la clé
+                if (!is_string($href) || $href === '') {
+                    unset($item['href']);
+                    continue;
+                }
+
+                // externes/mail/tel → on laisse comme c'est
                 if (preg_match('~^(https?:)?//~i', $href) || str_starts_with($href, 'mailto:') || str_starts_with($href, 'tel:')) {
                     continue;
                 }
+
+                // href sous forme "route:nom_de_route"
                 if (str_starts_with($href, 'route:')) {
                     $route = trim(substr($href, 6));
                     try {
-                        $it['href'] = $this->urls->generate($route, ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_PATH);
+                        $item['href'] = $this->urls->generate($route, ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_PATH);
                     } catch (\Throwable) {
-                        unset($it['href']);
+                        unset($item['href']); // route inconnue → on supprime
                     }
                     continue;
                 }
-                $path = $href[0] === '/' ? $href : '/'.$href;
-                if ($prefix && !str_starts_with($path, $prefix.'/')) {
-                    $path = $prefix.$path;
+
+                // chemin relatif/interne : on force le leading slash
+                $path = ($href[0] ?? '') === '/' ? $href : '/' . $href;
+
+                // on préfixe par la locale si fournie et pas déjà présente
+                if ($prefix && !str_starts_with($path, $prefix . '/')) {
+                    $path = $prefix . $path;
                 }
-                $it['href'] = $path;
+
+                $item['href'] = $path;
             }
         }
-        unset($cat, $it);
+        unset($category, $item);
 
-        $json = json_encode($data, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        // 6) Encodage JSON "lisible" (pas d'escape inutile)
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        $response = new Response($json, 200, ['Content-Type' => 'application/json; charset=utf-8']);
-        // Cache soft (tu peux ajuster ou enlever si tu préfères)
+        // 7) Réponse simple + cache public léger (pas d’ETag pour rester “débutant”)
+        $response = new Response($json ?: '{}', Response::HTTP_OK, [
+            'Content-Type' => 'application/json; charset=utf-8',
+        ]);
         $response->setPublic();
-        $response->setMaxAge(300);
-        $response->setSharedMaxAge(300);
-        $response->setEtag(sha1($json));
-        if ($response->isNotModified($request)) {
-            return $response;
-        }
+        $response->setMaxAge(300); // 5 minutes
+
         return $response;
     }
 }
