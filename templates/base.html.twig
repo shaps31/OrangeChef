@@ -29,140 +29,8 @@
     {% block stylesheets %}
         {{ importmap('app') }}
         <link rel="stylesheet" href="{{ asset('styles/theme-citrus.css') }}">
+
     {% endblock %}
-
-    {# --- Styles nav compact (bouton + panneau) --- #}
-    <style>
-        /* Menu collant (version simple) */
-
-        /* Variables */
-        :root{
-            --oc-orange:#ff9800;
-            --oc-bg:#fff7eb;
-            --oc-pill:#fff;
-            --oc-border:#ffd6a6;
-            --oc-shadow:0 8px 24px rgba(0,0,0,.08);
-            --oc-ring:0 0 0 3px rgba(255,152,0,.20);
-            --oc-text:#1f2937;
-        }
-        @media (prefers-color-scheme: dark){
-            :root{
-                --oc-bg:#1b1205;
-                --oc-pill:#1d1610;
-                --oc-border:#3b2a17;
-                --oc-shadow:0 10px 28px rgba(0,0,0,.35);
-                --oc-text:#f7f2eb;
-            }
-        }
-
-        /* Layout nav */
-        .nav-container{display:flex;justify-content:space-between;align-items:center;gap:16px}
-        .main-nav{ position: sticky; top: 64px; z-index: 20; box-shadow:0 6px 18px rgba(0,0,0,.04); }
-
-        /* Toggle du mega-menu */
-        #ocMenuToggle{
-            display:flex;align-items:center;gap:.5rem;
-            background:var(--oc-pill); color:#1f2430;
-            border:1px solid var(--oc-border); border-radius:999px;
-            padding:.35rem .75rem; cursor:pointer; font-weight:700;
-            box-shadow:0 1px 0 rgba(16,24,40,.06);
-        }
-        #ocMenuToggle:hover{ background:#fff; }
-        #ocMenuToggle .chev{ transition: transform .16s ease; display:inline-block; }
-        #ocMenuToggle[aria-expanded="true"] .chev{ transform: rotate(180deg); }
-
-        /* Panneau */
-        .menu-panel{
-            /* panneau joli */
-            background: linear-gradient(180deg,#FFF8F0 0%, #FFFFFF 60%);
-            border:1px solid #ffe2bd; border-radius:16px;
-            box-shadow:0 8px 28px rgba(255,152,0,.12);
-            padding:18px 18px 12px;
-            /* grille pour anim d’ouverture/fermeture */
-            display:grid; grid-template-rows: 0fr;       /* fermé par défaut */
-            overflow: clip;                               /* masque l’anim */
-            transition: grid-template-rows .22s ease;
-        }
-        .menu-panel[data-anim="open"]{ grid-template-rows: 1fr; }
-        .menu-panel > .menu-inner{ min-height:0; overflow:hidden; }
-
-        /* Contenu interne */
-        .menu-grid{max-width:1200px;margin:0 auto;display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-        .menu-group{padding:8px 0;}
-        .menu-group + .menu-group{border-top:1px dashed var(--oc-border); padding-top:16px; margin-top:8px}
-
-        /* Titres de section */
-        .menu-group h4{
-            margin:0 0 10px; font-weight:800; letter-spacing:.2px; color:#ff8b00;
-            display:flex;align-items:center;gap:8px;
-        }
-        .menu-group h4::after{
-            content:""; flex:1 1 auto; height:2px; border-radius:2px;
-            background:linear-gradient(90deg,#ffd199,transparent); margin-left:8px;
-        }
-
-        /* Liens (pills) */
-        .menu-group .links{display:flex;flex-wrap:wrap;gap:10px}
-        .menu-group .links a{
-            display:inline-flex; align-items:center; gap:8px;
-            padding:8px 12px; border-radius:999px;
-            background:#fff; border:1px solid #ffe3c6; color:var(--oc-text);
-            box-shadow:0 2px 10px rgba(0,0,0,.03);
-            text-decoration:none;
-            transition:transform .12s ease, box-shadow .12s ease, background-color .12s ease, border-color .12s ease;
-        }
-        .menu-group .links a:hover{
-            transform:translateY(-1px);
-            box-shadow:0 8px 18px rgba(255,152,0,.15);
-            border-color:#ffc78f; background:#fffdf9;
-        }
-        .menu-group .links a:active{ transform:translateY(0) scale(.99); }
-        .menu-group .links a.is-active{
-            border-color:#ff9800; background:#fff3e0; font-weight:700;
-            box-shadow:0 6px 14px rgba(255,152,0,.18);
-        }
-        .menu-group .links a:focus-visible{
-            outline:0; box-shadow:var(--oc-ring), 0 8px 18px rgba(255,152,0,.12); border-color:#ff9800;
-        }
-
-        /* Formulaire de recherche (si utilisé dans le panel) */
-        .menu-group.search .search-form{display:flex; gap:8px}
-        .menu-group.search input{
-            flex:1; height:36px; border-radius:999px; border:1.5px solid var(--oc-border);
-            background:#fff7eb; padding:0 12px;
-        }
-        .menu-group.search button{
-            height:36px; border-radius:999px; border:1px solid var(--oc-border);
-            background:#fff; padding:0 12px; font-weight:700;
-        }
-
-        /* Badges */
-        .chip{display:inline-block; margin-left:6px; padding:.05rem .45rem; border-radius:999px; background:#ff9800; color:#fff; font-size:.75rem}
-
-        /* Responsive */
-        @media (max-width: 920px){
-            .menu-grid{ gap:16px; }
-            .menu-group .links a{ padding:7px 11px; }
-            .menu-panel{ padding:14px 14px 10px; }
-        }
-        @media (max-width: 720px){ .nav-container{flex-wrap:wrap} }
-
-        /* Accessibilité – animations */
-        @media (prefers-reduced-motion: reduce){
-            .menu-group .links a, #ocMenuToggle .chev, .menu-panel{ transition:none !important; }
-        }
-
-        /* Dark mode */
-        @media (prefers-color-scheme: dark){
-            .menu-panel{ background:linear-gradient(180deg,#2b1b00 0%, #1b1205 60%); border-color:#5f3b08; }
-            .menu-group h4{ color:#ffb860; }
-            .menu-group .links a{ background:var(--oc-pill); border-color:var(--oc-border); color:var(--oc-text); }
-            .menu-group .links a:hover{ border-color:#7a4a10; }
-            .menu-group .links a.is-active{ background:#3b2914; border-color:#ffb860; }
-        }
-
-
-    </style>
 
     {% block meta %}{% endblock %}
 </head>
@@ -345,38 +213,10 @@
     window.HELP_KB_URL = '{{ path('app_contact', {'_locale': app.request.locale}) }}';
 </script>
 
-{# --- JS: Toggle menu global + fermeture hors-clic/Échap --- #}
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const toggle = document.getElementById('ocMenuToggle');
-        const panel  = document.getElementById('ocMenuPanel');
-        if (!toggle || !panel) return;
-
-        const open  = () => { panel.hidden = false;  toggle.setAttribute('aria-expanded', 'true');  };
-        const close = () => { panel.hidden = true;   toggle.setAttribute('aria-expanded', 'false'); };
-
-        toggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            panel.hidden ? open() : close();
-        });
-
-        document.addEventListener('click', (e) => {
-            if (panel.hidden) return;
-            if (!panel.contains(e.target) && !toggle.contains(e.target)) close();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') close();
-        });
-    });
-</script>
-
-
-
-
 
 {% include '_partials/help_widget.html.twig' %}
+<script src="{{ asset('js/menu.js') }}" defer></script>
+
 
 </body>
 </html>
