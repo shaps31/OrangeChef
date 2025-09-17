@@ -25,9 +25,11 @@ class OrangeChefController extends AbstractController
             3                          // limite
         );
 
-        $recipesCount = $recipes->count(['isPublic' => true]);
+        $latest       = $recipes->findLatestPublic(3);
+        $recipesCount = $recipes->countPublic();
         $usersCount   = $users->count([]);
-        $reviewsCount = $reviews->count(['isApproved' => true]);
+        $reviewsCount = $reviews->countApproved();
+
 
 
         return $this->render('orange_chef/index.html.twig', [
@@ -66,7 +68,7 @@ class OrangeChefController extends AbstractController
         $notification->sendTemplate(
             to: 'test@local.test',
             subject: '🍊 OrangeChef • Démo personnalisée',
-            htmlTemplate: 'email/orange_demo.html.twig',        // ✅ bon chemin
+            htmlTemplate: 'email/orange_demo.html.twig',
             context: [
                 'userName' => 'Shabadine',
                 'abc' => '123',
@@ -74,7 +76,7 @@ class OrangeChefController extends AbstractController
                 'ctaUrl' => $this->generateUrl('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'subject' => '🍊 OrangeChef • Démo personnalisée',
             ],
-            textTemplate: 'email/orange_demo.txt.twig'          // ✅ bon chemin
+            textTemplate: 'email/orange_demo.txt.twig'
         );
 
         return new Response('Mail personnalisé envoyé.');

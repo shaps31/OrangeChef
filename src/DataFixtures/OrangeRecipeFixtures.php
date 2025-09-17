@@ -12,24 +12,17 @@ class OrangeRecipeFixtures extends Fixture implements FixtureGroupInterface
 {
     public static function getGroups(): array
     {
-        // Permet de charger juste ce lot si on veut --group=orange
         return ['orange'];
     }
 
     public function load(ObjectManager $em): void
     {
-        // Trouve un auteur existant (prend le 1er trouvé)
         /** @var User|null $author */
-        $author = $em->getRepository(User::class)->findOneBy([]); // adapte si tu veux cibler un admin
-        if (!$author) {
-            // Si tu n'as aucun utilisateur, commente la ligne setAuthor plus bas, ou crée un user ici.
-            // throw new \RuntimeException('Aucun utilisateur trouvé pour attribuer les recettes.');
-        }
+        $author = $em->getRepository(User::class)->findOneBy([]);
 
-        // Petits helpers pour texte multilignes
+        // helper multilignes
         $nl = fn(array $lines) => implode("\n", array_map('trim', $lines));
 
-        // Recettes à l’orange (titres uniques pour éviter les doublons)
         $data = [
             [
                 'title'       => 'Gâteau à l’orange moelleux',
@@ -37,7 +30,7 @@ class OrangeRecipeFixtures extends Fixture implements FixtureGroupInterface
                 'difficulty'  => 'facile',
                 'servings'    => 8,
                 'totalTime'   => 55,
-                'image'       => null, // ex: 'uploads/recipes/gateau-orange.jpg'
+                'image'       => null,
                 'description' => 'Un gâteau parfumé et fondant, avec zeste et jus d’orange.',
                 'ingredients' => $nl([
                     '3 œufs',
@@ -109,7 +102,7 @@ class OrangeRecipeFixtures extends Fixture implements FixtureGroupInterface
                 'servings'    => 6,
                 'totalTime'   => 90,
                 'image'       => null,
-                'description' => 'Confíiture parfumée avec zeste et jus d’orange.',
+                'description' => 'Confiture parfumée avec zeste et jus d’orange.',
                 'ingredients' => $nl([
                     '1 kg d’oranges (bio de préférence)',
                     '700 g de sucre',
@@ -207,9 +200,9 @@ class OrangeRecipeFixtures extends Fixture implements FixtureGroupInterface
         $repo = $em->getRepository(Recipe::class);
 
         foreach ($data as $row) {
-            // Idempotence : si une recette du même titre existe déjà, on saute
-            $exists = $repo->findOneBy(['title' => $row['title']]);
-            if ($exists) { continue; }
+            if ($repo->findOneBy(['title' => $row['title']])) {
+                continue; // idempotent
+            }
 
             $r = (new Recipe())
                 ->setTitle($row['title'])
@@ -219,15 +212,14 @@ class OrangeRecipeFixtures extends Fixture implements FixtureGroupInterface
                 ->setCategory($row['category'])
                 ->setDifficulty($row['difficulty'])
                 ->setServings($row['servings'])
-
                 ->setCreatedAt(new \DateTimeImmutable('-'.mt_rand(1,30).' days'));
 
-            $this->assignTotalMinutes($r, (int)$row['totalTime']);
+            // >>> temps : remplit preparation_time / cooking_time NOT NULL
+            $this->assignTotalMinutes($r, (int) $row['totalTime']);
 
-            if (!empty($row['image'])) {
-                $r->setImage($row['image']); // si ton entité a ce champ
+            if (!empty($row['image']) && method_exists($r, 'setImage')) {
+                $r->setImage($row['image']);
             }
-
             if ($author && method_exists($r, 'setAuthor')) {
                 $r->setAuthor($author);
             }
@@ -237,21 +229,33 @@ class OrangeRecipeFixtures extends Fixture implements FixtureGroupInterface
 
         $em->flush();
     }
+
+    /**
+     * Assigne un temps total en (prépa/cuisson) selon les setters disponibles,
+     * en garantissant que la prépa n’est jamais nulle pour les colonnes NOT NULL.
+     */
     private function assignTotalMinutes(object $recipe, int $minutes): void
     {
-        // 1) Champ "totalTime" si dispo
-        if (method_exists($recipe, 'setTotalTime')) { $recipe->setTotalTime($minutes); return; }
-
-        // 2) Champ "duration" ou "time"
-        if (method_exists($recipe, 'setDuration')) { $recipe->setDuration($minutes); return; }
-        if (method_exists($recipe, 'setTime'))     { $recipe->setTime($minutes);     return; }
-
-        // 3) Champs séparés "prepTime" / "cookTime"
-        $prep = max(5, (int) round($minutes * 0.4));
+        $minutes = max(1, $minutes);
+        $prep = max(1, (int) round($minutes * 0.4));
         $cook = max(0, $minutes - $prep);
 
-        if (method_exists($recipe, 'setPrepTime')) { $recipe->setPrepTime($prep); }
-        if (method_exists($recipe, 'setCookTime')) { $recipe->setCookTime($cook); }
-    }
+        // 1) Préférence : PreparationTime / CookingTime (correspond aux colonnes preparation_time / cooking_time)
+        $hasPrep = method_exists($recipe, 'setPreparationTime');
+        $hasCook = method_exists($recipe, 'setCookingTime');
+        if ($hasPrep || $hasCook) {
+            if ($hasPrep) { $recipe->setPreparationTime($prep); }
+            if ($hasCook) { $recipe->setCookingTime($cook); }
+            return;
+        }
 
+        // 2) Variantes de nommage usuelles
+        if (method_exists($recipe, 'setPrepTime'))  { $recipe->setPrepTime($prep); }
+        if (method_exists($recipe, 'setCookTime'))  { $recipe->setCookTime($cook); }
+
+        // 3) Champs alternatifs uniques
+        if (method_exists($recipe, 'setTotalTime')) { $recipe->setTotalTime($minutes); }
+        if (method_exists($recipe, 'setDuration'))  { $recipe->setDuration($minutes); }
+        if (method_exists($recipe, 'setTime'))      { $recipe->setTime($minutes); }
+    }
 }
