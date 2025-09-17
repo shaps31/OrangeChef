@@ -9,24 +9,43 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    /**
+     * Page de connexion.
+     * - On récupère la dernière erreur d'authentification (s'il y en a une)
+     * - On récupère le dernier identifiant saisi (pour préremplir le champ)
+     * - On affiche le template Twig "security/login.html.twig"
+     */
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
+        // Astuce : si l'utilisateur est déjà connecté, on peut le rediriger ailleurs (ex: dashboard).
         // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
+        //     return $this->redirectToRoute('app_dashboard');
         // }
 
-        // get the login error if there is one
+        // Récupère l'erreur de login (mauvais mot de passe, compte inconnu, etc.)
         $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
+
+        // Récupère le dernier nom d'utilisateur saisi (email/username) pour le remettre dans le formulaire
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        // On envoie ces infos au template pour affichage
+        return $this->render('security/login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
+        ]);
     }
 
+    /**
+     * Déconnexion.
+     * Cette méthode est VOLONTAIREMENT vide :
+     * le firewall de Symfony intercepte la route /logout et fait la déconnexion à notre place.
+     * (Voir security.yaml > firewalls > logout)
+     */
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        // On ne met rien ici : Symfony gère tout via la config de sécurité.
+        throw new \LogicException('Cette méthode est vide : la déconnexion est gérée par le firewall.');
     }
 }
