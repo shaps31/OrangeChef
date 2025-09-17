@@ -54,7 +54,8 @@ class ReviewController extends AbstractController
         $review = (new Review())
             ->setRecipe($recipe)
             ->setAuthor($this->getUser())
-            ->setIsApproved(true);
+            ->setIsApproved($this->isGranted('ROLE_ADMIN'));
+
 
         // Un non-admin → avis en modération
         if (!$this->isGranted('ROLE_ADMIN')) {
@@ -145,7 +146,10 @@ class ReviewController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function adminList(ReviewRepository $repo, Request $request): Response
     {
-        $status   = $request->query->get('status', 'pending'); // pending|approved|all
+        $status = in_array($request->query->get('status', 'pending'), ['pending','approved','all'], true)
+            ? $request->query->get('status', 'pending')
+            : 'pending';
+
         $page     = max(1, (int) $request->query->get('p', 1));
         $pageSize = 15;
 
@@ -169,23 +173,30 @@ class ReviewController extends AbstractController
     }
 
 
+    // Route d’admin pour approuver un avis :
+// - URL: /admin/avis/{id}/approve avec {id} numérique
+// - Méthode HTTP: POST (on évite GET pour une action mutatrice)
+// - Nom de route: app_admin_review_approve
     #[Route('/admin/avis/{id<\d+>}/approve', name: 'app_admin_review_approve', methods: ['POST'])]
+// Sécurité : seulement un utilisateur avec le rôle ADMIN peut l’exécuter
     #[IsGranted('ROLE_ADMIN')]
-    public function approve(Review $review, Request $request, EntityManagerInterface $em,Notification $notification): Response
-    {
-        // (facultatif) on peut aussi appeler le voter:
-        // $this->denyAccessUnlessGranted(ReviewVoter::APPROVE, $review);
+    public function approve(
+        Review $review,                   // ParamConverter: Symfony charge l’entité Review par son {id}
+        Request $request,                 // Accès au POST (pour récupérer le jeton CSRF)
+        EntityManagerInterface $em,       // Pour flush en base
+        Notification $notification        // Service perso: envoi d’e-mails (templated)
+    ): Response {
 
+        // Protection CSRF : on vérifie que le jeton posté est valide.
+        // Le tokenId doit correspondre à celui utilisé dans le formulaire d’approbation.
         if ($this->isCsrfTokenValid('approve_review_'.$review->getId(), (string) $request->request->get('_token'))) {
-            $review->setIsApproved(true);
-            $em->flush();
-            $this->addFlash('success', 'Avis approuvé.');
-        }
-        if ($this->isCsrfTokenValid('approve_review_'.$review->getId(), (string)$request->request->get('_token'))) {
+
+            // Marque l’avis comme “approuvé” et enregistre en base
             $review->setIsApproved(true);
             $em->flush();
 
-            // ping auteur
+            // Notification de l’auteur (si l’email existe).
+            // Try/catch pour ne pas bloquer l’UX si l’envoi échoue.
             if ($review->getAuthor()?->getEmail()) {
                 try {
                     $notification->sendTemplate(
@@ -199,15 +210,19 @@ class ReviewController extends AbstractController
                         ],
                         textTemplate: 'email/review_approved.txt.twig'
                     );
-                } catch (\Throwable $e) { /* silencieux ou flash */ }
+                } catch (\Throwable $e) {
+                    // On ignore l’erreur d’envoi (ou on peut addFlash/loguer).
+                }
             }
 
+            // Message de succès pour l’admin
             $this->addFlash('success', 'Avis approuvé.');
         }
 
-
+        // Quoi qu’il arrive, on revient à la liste d’administration des avis
         return $this->redirectToRoute('app_admin_reviews');
     }
+
 
     #[Route('/admin/avis/{id<\d+>}/reject', name: 'app_admin_review_reject', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
