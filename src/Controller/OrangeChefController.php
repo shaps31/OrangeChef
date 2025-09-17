@@ -111,7 +111,7 @@ class OrangeChefController extends AbstractController
                     htmlTemplate: 'email/notification_formulaire.html.twig',
                     context: [
                         'abc' => $abc,
-                        'parameter' => $parametre,
+                        'parametre' => $parametre,
                         'subject' => 'Requête reçue',
                     ],
                     textTemplate: 'email/notification_formulaire.txt.twig'
