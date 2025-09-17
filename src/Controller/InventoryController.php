@@ -40,7 +40,11 @@ class InventoryController extends AbstractController
 
         // --- Statistiques simples sur le stock ---
         // Somme des quantités
-        $totalOranges = array_sum(array_map(fn($item) => $item->getQuantity(), $inventory));
+        $totalOranges = array_sum(array_map(
+            fn($item) => (int) $item->getQuantity(),
+            $inventory
+        ));
+
 
         // Items qui expirent bientôt (implémentation déléguée aux méthodes du modèle)
         $expiringSoon = array_filter($inventory, fn($item) => $item->isExpiringSoon() && !$item->isExpired());
@@ -104,7 +108,7 @@ class InventoryController extends AbstractController
      * Consultation d'un item d'inventaire spécifique.
      * - Vérifie que l'utilisateur connecté est bien propriétaire de l'item.
      */
-    #[Route('/{id}', name: 'app_inventory_show', methods: ['GET'])]
+    #[Route('/{id<\d+>}', name: 'app_inventory_show', methods: ['GET'])]
     public function show(OrangeInventory $inventory): Response
     {
         // Sécurité : seul le propriétaire peut voir l'item
@@ -122,7 +126,7 @@ class InventoryController extends AbstractController
      * - Vérifie la propriété.
      * - Sauvegarde si le formulaire est valide.
      */
-    #[Route('/{id}/modifier', name: 'app_inventory_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id<\d+>}/modifier', name: 'app_inventory_edit', methods: ['GET','POST'])]
     public function edit(Request $request, OrangeInventory $inventory, EntityManagerInterface $entityManager): Response
     {
         // Sécurité : seul le propriétaire peut éditer
@@ -154,7 +158,7 @@ class InventoryController extends AbstractController
      * - Vérifie la propriété.
      * - Protégé par un token CSRF.
      */
-    #[Route('/{id}/supprimer', name: 'app_inventory_delete', methods: ['POST'])]
+    #[Route('/{id<\d+>}/supprimer', name: 'app_inventory_delete', methods: ['POST'])]
     public function delete(Request $request, OrangeInventory $inventory, EntityManagerInterface $entityManager): Response
     {
         // Sécurité : seul le propriétaire peut supprimer
@@ -163,7 +167,7 @@ class InventoryController extends AbstractController
         }
 
         // Vérification du token CSRF (généré côté template)
-        if ($this->isCsrfTokenValid('delete'.$inventory->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$inventory->getId(), (string) $request->request->get('_token'))) {
             $entityManager->remove($inventory);
             $entityManager->flush();
             $this->addFlash('success', 'Stock supprimé');
@@ -184,24 +188,26 @@ class InventoryController extends AbstractController
         $user = $this->getUser();
 
         // Items qui expirent entre maintenant et maintenant + 7 jours (triés croissant)
+        $now  = new \DateTimeImmutable('now');
+        $soon = $now->modify('+7 days');
+        // Items déjà expirés (triés du plus récemment expiré au plus ancien)
         $expiringSoon = $entityManager->getRepository(OrangeInventory::class)
             ->createQueryBuilder('i')
             ->where('i.user = :user')
             ->andWhere('i.expirationDate BETWEEN :now AND :soon')
             ->setParameter('user', $user)
-            ->setParameter('now', new \DateTime())
-            ->setParameter('soon', new \DateTime('+7 days'))
+            ->setParameter('now',  $now)
+            ->setParameter('soon', $soon)
             ->orderBy('i.expirationDate', 'ASC')
             ->getQuery()
             ->getResult();
 
-        // Items déjà expirés (triés du plus récemment expiré au plus ancien)
         $expired = $entityManager->getRepository(OrangeInventory::class)
             ->createQueryBuilder('i')
             ->where('i.user = :user')
             ->andWhere('i.expirationDate < :now')
             ->setParameter('user', $user)
-            ->setParameter('now', new \DateTime())
+            ->setParameter('now',  $now)
             ->orderBy('i.expirationDate', 'DESC')
             ->getQuery()
             ->getResult();
