@@ -64,14 +64,27 @@ class RecipeRepository extends ServiceEntityRepository
             ->getResult(); // on exécute et on récupère les entités Recipe
     }
 
+    /**
+     * Renvoie les dernières recettes **publiques**.
+     * - $limit : combien d’éléments on veut (3 par défaut)
+     * - utilise findBy(criteria, orderBy, limit)
+     */
     public function findLatestPublic(int $limit = 3): array
     {
-        return $this->findBy(['isPublic' => true], ['createdAt' => 'DESC'], $limit);
+        return $this->findBy(
+            ['isPublic' => true],        // WHERE is_public = 1
+            ['createdAt' => 'DESC'],     // ORDER BY created_at DESC (plus récentes d'abord)
+            $limit                       // LIMIT ?
+        );
     }
 
+    /**
+     * Compte combien de recettes **publiques** existent.
+     * - retourne un entier (0, 1, 2, …)
+     */
     public function countPublic(): int
     {
-        return $this->count(['isPublic' => true]);
+        return $this->count(['isPublic' => true]); // SELECT COUNT(*) WHERE is_public = 1
     }
 
 }
