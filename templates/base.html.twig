@@ -33,7 +33,8 @@
 
     {# --- Styles nav compact (bouton + panneau) --- #}
     <style>
-        /* ====================== Orange Chef – Menu collant “au propre” ====================== */
+        /* Menu collant (version simple) */
+
         /* Variables */
         :root{
             --oc-orange:#ff9800;
@@ -184,7 +185,7 @@
         </div>
 
         <div class="header-actions">
-            {# --- Switch langue robuste --- #}
+            {# Changer de langue #}
             {% set currentRoute  = app.request.attributes.get('_route')|default('app_home') %}
             {% set currentParams = app.request.attributes.get('_route_params')|default({}) %}
             {% if currentParams is not iterable %}{% set currentParams = {} %}{% endif %}
@@ -338,7 +339,8 @@
     </div>
 </footer>
 
-{# --- JS: URLs globales (fallback sûr) --- #}
+{# Petites variables JS #}
+
 <script>
     window.HELP_KB_URL = '{{ path('app_contact', {'_locale': app.request.locale}) }}';
 </script>
