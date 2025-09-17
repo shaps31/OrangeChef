@@ -273,6 +273,42 @@ body{
 .btn-danger{background:#dc3545;color:#fff}
 .btn-danger:hover{background:#c82333}
 
+/* === Orange Chef Buttons (anti-Bootswatch clash) === */
+.oc-btn {
+    display:inline-flex; align-items:center; justify-content:center;
+    gap:6px; padding:8px 12px; border-radius:10px; font-weight:700;
+    text-decoration:none; line-height:1; box-shadow:0 3px 10px rgba(0,0,0,.12);
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+    border:0;
+}
+.oc-btn:hover { transform:translateY(-2px); box-shadow:0 10px 26px rgba(255,152,0,.25); }
+.oc-btn-sm { padding:6px 10px; font-size:13px; }
+
+/* primaire orange */
+.oc-btn-primary {
+    background:linear-gradient(135deg, var(--oc-orange), var(--oc-orange-700));
+    color:#fff !important; border:2px solid transparent;
+}
+.oc-btn-primary:hover {
+    background:linear-gradient(135deg, var(--oc-orange-700), var(--oc-orange-800));
+}
+
+/* secondaire (outline orange) */
+.oc-btn-secondary {
+    background:#fff; color:var(--oc-orange) !important;
+    border:2px solid var(--oc-orange);
+}
+.oc-btn-secondary:hover { background:var(--oc-orange); color:#fff !important; }
+
+/* sécurité : neutraliser les styles Bootswatch si jamais mélangés */
+.oc-btn.btn, .oc-btn.btn-primary, .oc-btn.btn-secondary { all: unset; }
+.oc-btn.btn, .oc-btn.btn-primary, .oc-btn.btn-secondary { /* puis ré-applique oc-btn */
+    display:inline-flex; align-items:center; justify-content:center;
+    gap:6px; padding:8px 12px; border-radius:10px; font-weight:700;
+    text-decoration:none; line-height:1; box-shadow:0 3px 10px rgba(0,0,0,.12);
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
 /* Spinner */
 .loading-spinner{
     display:inline-block;width:20px;height:20px;border:2px solid rgba(255,152,0,.3);border-radius:50%;
@@ -1707,10 +1743,19 @@ body{
 .table thead th{background:#fffaf2;color:#a66a00;text-align:left;font-weight:600}
 .actions-col{width:170px}
 
-.badge{padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
-.badge-ok{background:linear-gradient(180deg,#FFF7EB,#FFF1E0);color:var(--oc-success-ink,#7a4a00);border:1px solid rgba(255,152,0,.35)}
-.badge-warn{background:#fff3e0;color:#f57c00}
-.badge-bad{background:#ffebee;color:#c62828}
+/* === INVENTORY: chips / badges locaux === */
+.inv-badges .badge { margin-top: 4px; }
+
+.badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.badge-ok{
+    background: linear-gradient(180deg,#FFF7EB,#FFF1E0);
+    color: var(--oc-success-ink,#7a4a00);
+    border: 1px solid rgba(255,152,0,.35);
+}
+.badge-warn{ background:#fff3e0; color:#f57c00; }
+.badge-bad{ background:#ffebee; color:#c62828; }
+.badge-neutral{ background:#f5f5f5; color:#555; }
+
 
 .row-actions{display:flex;gap:8px}
 

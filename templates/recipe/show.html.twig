@@ -117,12 +117,15 @@
 
                     {% if app.user %}
                         <div class="mt-2">
-                            <form method="post" action="{{ path('app_favorite_toggle', {id: recipe.id}) }}" style="display:inline">
+                            <form method="post"
+                                  action="{{ path('app_favorite_toggle', { _locale: app.request.locale, id: recipe.id }) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('fav_' ~ recipe.id) }}">
-                                <button type="submit" class="btn {{ isFav ? 'btn-secondary' : 'btn-primary' }}">
+                                <input type="hidden" name="return" value="{{ app.request.uri }}">
+                                <button class="btn {{ isFav ? 'btn-secondary' : 'btn-primary' }}">
                                     {{ isFav ? '💔 Retirer des favoris' : '❤️ Ajouter aux favoris' }}
                                 </button>
                             </form>
+
                         </div>
                     {% endif %}
                 </div>
@@ -176,9 +179,9 @@
             {# Partage #}
             {% include '_partials/share.html.twig' with { recipe: recipe } %}
 
-            <!-- Notes & avis -->
+            <!-- Notes et avis -->
             <section class="review-section mt-4" id="reviews">
-                <h2>Notes & avis</h2>
+                <h2>Notes et avis</h2>
 
                 <p class="muted">
                     Moyenne: {{ avgApproved }}/5
@@ -245,9 +248,11 @@
                             {{ form_start(form_review, { action: path('app_review_new', { id: recipe.id }) }) }}
                             {% set field = form_review.rating %}
 
-                            <div class="rating-field">
-                                <label class="form-label">Votre note</label>
+                            <fieldset class="rating-field">
+                                <legend class="form-label">Votre note</legend>
+
                                 <div class="rating-stars">
+                                    {# 5 -> 1 pour la coloration en row-reverse #}
                                     {% for i in 5..1 %}
                                         <input
                                             type="radio"
@@ -255,12 +260,14 @@
                                             name="{{ field.vars.full_name }}"
                                             value="{{ i }}"
                                             {% if field.vars.value == i %}checked{% endif %}
-                                        />
+                                        >
                                         <label for="{{ field.vars.id }}_{{ i }}" title="{{ i }} sur 5">★</label>
                                     {% endfor %}
                                 </div>
+
                                 {{ form_errors(field) }}
-                            </div>
+                            </fieldset>
+
 
                             {% if not is_granted('ROLE_ADMIN') %}
                                 <p class="muted" style="margin-top:8px">

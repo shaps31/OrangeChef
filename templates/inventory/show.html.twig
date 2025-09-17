@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container py-3">
 
-        {# --- Calculs statut --- #}
+        {# --- Statuts simples (on garde en Twig, lisible pour débutant) --- #}
         {% set now = date('now') %}
         {% set hasExp = inventory.expirationDate is not null %}
         {% set soonLimit = date('+3 days') %}
@@ -27,31 +27,32 @@
                 <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
                     <div>
                         <h1 class="h3 mb-1">📦 {{ inventory.variety|title }}</h1>
-                        <div class="d-flex gap-2">
+
+                        <div class="d-flex gap-2 inv-badges">
                             {# Stock #}
                             {% if qtyState == 'out' %}
-                                <span class="badge bg-danger">Rupture</span>
+                                <span class="badge badge-bad">Rupture</span>
                             {% elseif qtyState == 'low' %}
-                                <span class="badge bg-warning text-dark">Stock faible</span>
+                                <span class="badge badge-warn">Stock faible</span>
                             {% else %}
-                                <span class="badge bg-success">En stock</span>
+                                <span class="badge badge-ok">En stock</span>
                             {% endif %}
 
                             {# Péremption #}
                             {% if status == 'expired' %}
-                                <span class="badge bg-danger">Périmé</span>
+                                <span class="badge badge-bad">Périmé</span>
                             {% elseif status == 'soon' %}
-                                <span class="badge bg-warning text-dark">Péremption imminente</span>
+                                <span class="badge badge-warn">Péremption imminente</span>
                             {% elseif status == 'ok' %}
-                                <span class="badge bg-secondary">Frais</span>
+                                <span class="badge badge-ok">Frais</span>
                             {% else %}
-                                <span class="badge bg-secondary">Sans date</span>
+                                <span class="badge badge-neutral">Sans date</span>
                             {% endif %}
                         </div>
                     </div>
 
                     <div class="text-end">
-                        <a class="btn btn-outline-secondary me-2" href="{{ path('app_inventory_index') }}">← Retour</a>
+                        <a class="btn btn-secondary me-2" href="{{ path('app_inventory_index') }}">← Retour</a>
                         <a class="btn btn-primary" href="{{ path('app_inventory_edit', {id: inventory.id}) }}">✏️ Modifier</a>
                     </div>
                 </div>
@@ -70,9 +71,7 @@
                         <div class="p-3 border rounded-3">
                             <div class="small text-muted">Expiration</div>
                             <div class="fs-5">
-                                {% if hasExp %}
-                                    {{ inventory.expirationDate|date('d/m/Y') }}
-                                {% else %}—{% endif %}
+                                {% if hasExp %}{{ inventory.expirationDate|date('d/m/Y') }}{% else %}—{% endif %}
                             </div>
                         </div>
                     </div>
@@ -83,7 +82,7 @@
                             <div class="fs-5">
                                 {% if status == 'expired' %}⛔ Périmé
                                 {% elseif status == 'soon' %}⏳ Bientôt périmé
-                                {% elseif status == 'ok' %}✅ OK
+                                {% elseif status == 'ok' %}🟠 OK
                                 {% else %}—{% endif %}
                             </div>
                         </div>

@@ -8,9 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
-#[ORM\Table(name: 'review', uniqueConstraints: [
-    new ORM\UniqueConstraint(name: 'uniq_recipe_author', columns: ['recipe_id','author_id'])
-])]
+#[ORM\Table(name: 'review')]
+#[ORM\UniqueConstraint(name: 'uniq_recipe_author', columns: ['recipe_id', 'author_id'])]
 #[UniqueEntity(fields: ['recipe', 'author'], message: 'Vous avez déjà laissé un avis pour cette recette.')]
 class Review
 {
@@ -19,7 +18,6 @@ class Review
     #[ORM\Column]
     private ?int $id = null;
 
-    // --- manquait la propriété ici ---
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Recipe $recipe = null;
@@ -46,7 +44,6 @@ class Review
         $this->isApproved = true;
     }
 
-    // === Getters/Setters ===
     public function getId(): ?int { return $this->id; }
 
     public function getRecipe(): ?Recipe { return $this->recipe; }

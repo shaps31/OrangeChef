@@ -1,534 +1,289 @@
+{# templates/recipe/index.html.twig #}
 {% extends 'base.html.twig' %}
 {% set hide_global_search = true %}
-
 
 {% block title %}🍊 Recettes Orange Chef{% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="recipe-header">
-        <h1>🍊 Toutes nos Recettes</h1>
-        <p>Découvrez des recettes délicieuses à base d'oranges !</p>
+    <div class="container">
+        <div class="recipe-header">
+            <h1>🍊 Toutes nos Recettes</h1>
+            <p>Découvrez des recettes délicieuses à base d'oranges !</p>
 
-        {% if app.user %}
-            <a href="{{ path('app_recipe_new') }}" class="btn btn-primary">
-                ➕ Créer une recette
-            </a>
-        {% endif %}
-    </div>
+            {% if app.user %}
+                <a href="{{ path('app_recipe_new') }}" class="btn btn-primary">➕ Créer une recette</a>
+            {% endif %}
+        </div>
 
-    <!-- Filtres de recherche + outils d'affichage -->
-    <div class="recipe-filters">
-        {% set _diff = current_difficulty in ['moyen','moyenne'] ? 'moyenne' : current_difficulty %}
-        {% set _qval = current_search ?? app.request.get('q') ?? app.request.get('search') %}
-        {% set _per = perPage ?? app.request.get('per_page')|default(12) %}
+        {# Filtres #}
+        <div class="recipe-filters">
+            {% set _diff = current_difficulty in ['moyen','moyenne'] ? 'moyenne' : current_difficulty %}
+            {% set _qval = current_search ?? app.request.get('q') ?? app.request.get('search') %}
+            {# ⚠️ le contrôleur lit ps, pas per_page #}
+            {% set _per = page_size ?? app.request.get('ps')|default(12) %}
 
+            <form action="{{ path('app_recipe_index', {'_locale': app.request.locale}) }}" method="get" class="filters-form">
+                <div class="filter-row">
+                    {# ⚠️ le contrôleur lit p, pas page #}
+                    <input type="hidden" name="p" value="1">
 
-        <form action="{{ path('app_recipe_index', {'_locale': app.request.locale}) }}" method="get" class="filters-form">
-            <div class="filter-row">
-
-                <input type="hidden" name="page" value="1"> {# reset pagination à chaque filtrage #}
-
-                <div class="filter-group">
-                    <input type="text" name="q" value="{{ _qval }}"
-                           placeholder="Rechercher une recette, une catégorie, une variété…"
-                           class="form-control search-input" style="max-width:320px">
-                </div>
-
-                <div class="filter-group">
-                    <select name="category" class="form-select" onchange="this.form.submit()">
-                        <option value="">Toutes catégories</option>
-                        {% if categories is defined and categories is not empty %}
-                            {% for c in categories %}
-                                <option value="{{ c }}" {{ current_category == c ? 'selected' : '' }}>{{ c|title }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="dessert"   {{ current_category == 'dessert'   ? 'selected' : '' }}>🍰 Dessert</option>
-                            <option value="boisson"   {{ current_category == 'boisson'   ? 'selected' : '' }}>🥤 Boisson</option>
-                            <option value="plat"      {{ current_category == 'plat'      ? 'selected' : '' }}>🍽️ Plat</option>
-                            <option value="sauce"     {{ current_category == 'sauce'     ? 'selected' : '' }}>🥄 Sauce</option>
-                            <option value="confiture" {{ current_category == 'confiture' ? 'selected' : '' }}>🍯 Confiture</option>
-                            <option value="salade"    {{ current_category == 'salade'    ? 'selected' : '' }}>🥗 Salade</option>
-                        {% endif %}
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <select name="difficulty" class="form-select" onchange="this.form.submit()">
-                        <option value="">Toute difficulté</option>
-                        <option value="facile"     {{ _diff == 'facile'     ? 'selected' : '' }}>⭐ Facile</option>
-                        <option value="moyenne"    {{ _diff == 'moyenne'    ? 'selected' : '' }}>⭐⭐ Moyenne</option>
-                        <option value="difficile"  {{ _diff == 'difficile'  ? 'selected' : '' }}>⭐⭐⭐ Difficile</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <select name="sort" class="form-select" onchange="this.form.submit()">
-                        <option value="newest" {{ sort == 'newest' ? 'selected' : '' }}>🆕 Plus récentes</option>
-                        <option value="oldest" {{ sort == 'oldest' ? 'selected' : '' }}>🗓️ Plus anciennes</option>
-                        <option value="title"  {{ sort == 'title'  ? 'selected' : '' }}>🔤 Titre (A→Z)</option>
-                    </select>
-                </div>
-
-                {# ▼ Sélecteur "par page" ▼ #}
-                <div class="filter-group">
-                    <select name="per_page" class="form-select" onchange="this.form.submit()">
-                        {% for n in [10,20,50] %}
-                            <option value="{{ n }}" {{ _per == n ? 'selected' : '' }}>{{ n }} / page</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <button type="submit" class="btn btn-primary">Filtrer</button>
-                    <a href="{{ path('app_recipe_index', {'_locale': app.request.locale}) }}" class="btn btn-outline-secondary">Effacer</a>
-                </div>
-
-            </div>
-        </form>
-
-        {% if _qval %}
-            <p class="muted mt-2">Résultats pour « <strong>{{ _qval }}</strong> »</p>
-        {% endif %}
-
-        <style>
-            .filters-form .filter-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px}
-            .filters-form .filter-group{display:flex;align-items:center;gap:8px}
-            .filters-form .search-input{min-width:220px}
-        </style>
-
-
-
-
-        <style>
-            .filters-form .filter-row{
-                display:flex; flex-wrap:wrap; gap:12px; align-items:center;
-                margin-bottom:12px
-            }
-            .filters-form .filter-group{ display:flex; align-items:center; gap:8px }
-            .filters-form .search-input{ min-width:220px }
-            .filters-form .btn.btn-outline{ border:1px solid #ced4da }
-        </style>
-
-    </div>
-    {% if current_search %}
-        <p class="muted">Résultats pour « <strong>{{ current_search }}</strong> »</p>
-    {% endif %}
-
-    <!-- Grille des recettes -->
-    <div class="recipes-grid">
-        {% for recipe in recipes %}
-            <div class="recipe-card" data-card-index="{{ loop.index0 }}">
-                <div class="recipe-image">
-                    {% set img = recipe.image %}
-                    {% if img %}
-                        {# Always trust explicit recipe image #}
-                        {% set imgNoSlash = img starts with '/' ? img|slice(1) : img %}
-                        {% if imgNoSlash starts with 'uploads/' %}
-                            <img loading="lazy" decoding="async" src="{{ asset(imgNoSlash) }}" alt="{{ recipe.title }}">
-                        {% else %}
-                            <img loading="lazy" decoding="async" src="{{ asset('uploads/recipes/' ~ imgNoSlash) }}" alt="{{ recipe.title }}">
-                        {% endif %}
-                    {% else %}
-                        {# Fallback by category, then minimal keyword backup #}
-                        {% set cat = (recipe.category ?? '')|lower %}
-                        {% set fallback = null %}
-                        {% if 'dessert' in cat %}
-                            {% set fallback = 'tarte.jpg' %}
-                        {% elseif 'boisson' in cat %}
-                            {% set fallback = 'jus.jpg' %}
-                        {% elseif 'salade' in cat %}
-                            {% set fallback = 'salade.jpg' %}
-                        {% elseif 'plat' in cat %}
-                            {% set fallback = 'poulet.jpg' %}
-                        {% endif %}
-                        {% if not fallback %}
-                            {% set title_lc = (recipe.title ?? '')|lower %}
-                            {% if 'tarte' in title_lc %}
-                                {% set fallback = 'tarte.jpg' %}
-                            {% elseif 'jus' in title_lc %}
-                                {% set fallback = 'jus.jpg' %}
-                            {% elseif 'salade' in title_lc %}
-                                {% set fallback = 'salade.jpg' %}
-                            {% elseif 'poulet' in title_lc %}
-                                {% set fallback = 'poulet.jpg' %}
-                            {% endif %}
-                        {% endif %}
-                        {% if fallback %}
-                            <img loading="lazy" decoding="async" src="{{ asset('uploads/recipes/' ~ fallback) }}" alt="{{ recipe.title }}">
-                        {% else %}
-                            <div class="recipe-placeholder">🍊</div>
-                        {% endif %}
-                    {% endif %}
-                    <div class="recipe-badges">
-                        <span class="badge badge-chef">{{ recipe.categoryIcon }}</span>
-                        <span class="badge badge-bronze">{{ recipe.difficultyIcon }}</span>
+                    <div class="filter-group">
+                        <input type="text" name="q" value="{{ _qval }}" class="form-control search-input"
+                               placeholder="Rechercher une recette, une catégorie, une variété…" style="max-width:320px">
                     </div>
-                </div>
 
-                <div class="recipe-content">
-                    <h3><a href="{{ path('app_recipe_show', {id: recipe.id}) }}">{{ recipe.title }}</a></h3>
-                    {% set desc = recipe.description ?? '' %}
-                    <p class="recipe-description">{{ desc|length > 100 ? desc|slice(0, 100) ~ '…' : desc }}</p>
-
-                    <div class="recipe-meta">
-                        <div class="recipe-stats">
-                            <span>⏱️ {{ recipe.totalTime }}min</span>
-                            <span>👥 {{ recipe.servings }} pers.</span>
-                            <span>👁️ {{ recipe.views }}</span>
-                        </div>
-
-                        <div class="recipe-rating">
-                            {% if recipe.averageRating > 0 %}
-                                <span class="stars">
-                                    {% for i in 1..5 %}
-                                        {% if i <= recipe.averageRating %}⭐{% else %}☆{% endif %}
-                                    {% endfor %}
-                                </span>
-                                <span class="rating-count">({{ recipe.ratings|length }})</span>
+                    <div class="filter-group">
+                        <select name="category" class="form-select" onchange="this.form.submit()">
+                            <option value="">Toutes catégories</option>
+                            {% if categories is defined and categories is not empty %}
+                                {% for c in categories %}
+                                    <option value="{{ c }}" {{ current_category == c ? 'selected' : '' }}>{{ c|title }}</option>
+                                {% endfor %}
                             {% else %}
-                                <span class="no-rating">Pas encore noté</span>
+                                <option value="dessert"   {{ current_category == 'dessert'   ? 'selected' : '' }}>🍰 Dessert</option>
+                                <option value="boisson"   {{ current_category == 'boisson'   ? 'selected' : '' }}>🥤 Boisson</option>
+                                <option value="plat"      {{ current_category == 'plat'      ? 'selected' : '' }}>🍽️ Plat</option>
+                                <option value="sauce"     {{ current_category == 'sauce'     ? 'selected' : '' }}>🥄 Sauce</option>
+                                <option value="confiture" {{ current_category == 'confiture' ? 'selected' : '' }}>🍯 Confiture</option>
+                                <option value="salade"    {{ current_category == 'salade'    ? 'selected' : '' }}>🥗 Salade</option>
                             {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="difficulty" class="form-select" onchange="this.form.submit()">
+                            <option value="">Toute difficulté</option>
+                            <option value="facile"     {{ _diff == 'facile'     ? 'selected' : '' }}>⭐ Facile</option>
+                            <option value="moyenne"    {{ _diff == 'moyenne'    ? 'selected' : '' }}>⭐⭐ Moyenne</option>
+                            <option value="difficile"  {{ _diff == 'difficile'  ? 'selected' : '' }}>⭐⭐⭐ Difficile</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="sort" class="form-select" onchange="this.form.submit()">
+                            <option value="newest" {{ sort == 'newest' ? 'selected' : '' }}>🆕 Plus récentes</option>
+                            <option value="oldest" {{ sort == 'oldest' ? 'selected' : '' }}>🗓️ Plus anciennes</option>
+                            <option value="title"  {{ sort == 'title'  ? 'selected' : '' }}>🔤 Titre (A→Z)</option>
+                        </select>
+                    </div>
+
+                    {# ▼ par page (le contrôleur lit ps) ▼ #}
+                    <div class="filter-group">
+                        <select name="ps" class="form-select" onchange="this.form.submit()">
+                            {% for n in [10,20,50] %}
+                                <option value="{{ n }}" {{ _per == n ? 'selected' : '' }}>{{ n }} / page</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <button type="submit" class="btn btn-primary">Filtrer</button>
+                        <a href="{{ path('app_recipe_index', {'_locale': app.request.locale}) }}" class="btn btn-outline-secondary">Effacer</a>
+                    </div>
+                </div>
+            </form>
+
+            {% if _qval %}
+                <p class="muted mt-2">Résultats pour « <strong>{{ _qval }}</strong> »</p>
+            {% endif %}
+        </div>
+
+        {# Grille #}
+        <div class="recipes-grid">
+            {% for recipe in recipes %}
+                <div class="recipe-card" data-card-index="{{ loop.index0 }}">
+                    <div class="recipe-image">
+                        {% set img = recipe.image %}
+                        {% if img %}
+                            {% set imgNoSlash = img starts with '/' ? img|slice(1) : img %}
+                            {% if imgNoSlash starts with 'uploads/' %}
+                                <img loading="lazy" decoding="async" src="{{ asset(imgNoSlash) }}" alt="{{ recipe.title }}">
+                            {% else %}
+                                <img loading="lazy" decoding="async" src="{{ asset('uploads/recipes/' ~ imgNoSlash) }}" alt="{{ recipe.title }}">
+                            {% endif %}
+                        {% else %}
+                            {% set cat = (recipe.category ?? '')|lower %}
+                            {% set fallback = null %}
+                            {% if 'dessert' in cat %}{% set fallback = 'tarte.jpg' %}
+                            {% elseif 'boisson' in cat %}{% set fallback = 'jus.jpg' %}
+                            {% elseif 'salade'  in cat %}{% set fallback = 'salade.jpg' %}
+                            {% elseif 'plat'    in cat %}{% set fallback = 'poulet.jpg' %}
+                            {% endif %}
+                            {% if not fallback %}
+                                {% set title_lc = (recipe.title ?? '')|lower %}
+                                {% if 'tarte' in title_lc %}{% set fallback = 'tarte.jpg' %}
+                                {% elseif 'jus' in title_lc %}{% set fallback = 'jus.jpg' %}
+                                {% elseif 'salade' in title_lc %}{% set fallback = 'salade.jpg' %}
+                                {% elseif 'poulet' in title_lc %}{% set fallback = 'poulet.jpg' %}
+                                {% endif %}
+                            {% endif %}
+                            {% if fallback %}
+                                <img loading="lazy" decoding="async" src="{{ asset('uploads/recipes/' ~ fallback) }}" alt="{{ recipe.title }}">
+                            {% else %}
+                                <div class="recipe-placeholder">🍊</div>
+                            {% endif %}
+                        {% endif %}
+
+                        <div class="recipe-badges">
+                            <span class="badge badge-chef">{{ recipe.categoryIcon }}</span>
+                            <span class="badge badge-bronze">{{ recipe.difficultyIcon }}</span>
                         </div>
                     </div>
 
-                    <div class="recipe-actions">
-                        {% if app.user and recipe.author and recipe.author == app.user %}
-                            <a class="btn btn-small" href="{{ path('app_recipe_edit', {id: recipe.id}) }}">✏️ Modifier</a>
-                        {% endif %}
-                        <a class="btn btn-secondary btn-small" href="{{ path('app_recipe_show', {id: recipe.id}) }}">👀 Voir</a>
-                    </div>
+                    <div class="recipe-content">
+                        <h3><a href="{{ path('app_recipe_show', {id: recipe.id}) }}">{{ recipe.title }}</a></h3>
+                        {% set desc = recipe.description ?? '' %}
+                        <p class="recipe-description">{{ desc|length > 100 ? desc|slice(0, 100) ~ '…' : desc }}</p>
 
-                    <div class="recipe-author">
-                        <small>Par {{ recipe.author.displayName }}</small>
+                        {# ⭐ meta compacte : étoiles + (n) ne cassent plus #}
+                        <div class="recipe-meta rc-meta">
+                            <div class="recipe-stats rc-stats">
+                                <span>⏱️ {{ recipe.totalTime }}min</span>
+                                <span>👥 {{ recipe.servings }} pers.</span>
+                                <span>👁️ {{ recipe.views }}</span>
+                            </div>
+
+                            <div class="recipe-rating rc-item">
+                                {% set avg = (recipe.averageRating|default(0))|round(0, 'floor') %}
+                                {% if avg > 0 %}
+                                    <span class="rc-stars" aria-label="{{ avg }}/5">
+                  {% for i in 1..5 %}
+                      <span class="{{ i <= avg ? '' : 'off' }}">★</span>
+                  {% endfor %}
+                </span>
+                                    <small class="muted">({{ recipe.ratings|length }})</small>
+                                {% else %}
+                                    <span class="no-rating">Pas encore noté</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="recipe-actions">
+                            {% if app.user and recipe.author and recipe.author == app.user %}
+                                <a class="btn btn-small" href="{{ path('app_recipe_edit', {id: recipe.id}) }}">✏️ Modifier</a>
+                            {% endif %}
+                            <a class="btn btn-secondary btn-small" href="{{ path('app_recipe_show', {id: recipe.id}) }}">👀 Voir</a>
+                        </div>
+
+                        <div class="recipe-author"><small>Par {{ recipe.author.displayName }}</small></div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            <div class="no-recipes">
-                <div class="empty-state">
-                    <h3>🍊 Aucune recette trouvée</h3>
-                    <p>Soyez le premier à partager une délicieuse recette à l'orange !</p>
-                    {% if app.user %}
-                        <a href="{{ path('app_recipe_new') }}" class="btn btn-primary">Créer ma première recette</a>
+            {% else %}
+                <div class="no-recipes">
+                    <div class="empty-state">
+                        <h3>🍊 Aucune recette trouvée</h3>
+                        <p>Soyez le premier à partager une délicieuse recette à l'orange !</p>
+                        {% if app.user %}
+                            <a href="{{ path('app_recipe_new') }}" class="btn btn-primary">Créer ma première recette</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {# Pagination (inchangée sauf les bons noms d’args déjà présents) #}
+        {% if total_pages > 1 %}
+            {% set window = 2 %}
+            {% set start = page - window %}
+            {% set end   = page + window %}
+            {% set start = start < 1 ? 1 : start %}
+            {% set end   = end > total_pages ? total_pages : end %}
+
+            <nav class="pagination" role="navigation" aria-label="Pagination">
+                <a class="page-btn prev {{ page == 1 ? 'is-disabled' : '' }}"
+                   href="{{ path('app_recipe_index', {_locale: app.request.locale, p: page > 1 ? page - 1 : 1, ps: page_size, sort: sort, category: current_category, difficulty: current_difficulty, search: current_search }) }}"
+                   aria-disabled="{{ page == 1 ? 'true' : 'false' }}">⟵ Précédent</a>
+
+                <div class="page-numbers">
+                    {% if start > 1 %}
+                        <a class="page" href="{{ path('app_recipe_index', {_locale: app.request.locale, p: 1, ps: page_size, sort: sort, category: current_category, difficulty: current_difficulty, search: current_search }) }}">1</a>
+                        {% if start > 2 %}<span class="dots">…</span>{% endif %}
+                    {% endif %}
+
+                    {% for pnum in start..end %}
+                        {% if pnum == page %}
+                            <span class="page current" aria-current="page">{{ pnum }}</span>
+                        {% else %}
+                            <a class="page" href="{{ path('app_recipe_index', {_locale: app.request.locale, p: pnum, ps: page_size, sort: sort, category: current_category, difficulty: current_difficulty, search: current_search }) }}">{{ pnum }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if end < total_pages %}
+                        {% if end < total_pages - 1 %}<span class="dots">…</span>{% endif %}
+                        <a class="page" href="{{ path('app_recipe_index', {_locale: app.request.locale, p: total_pages, ps: page_size, sort: sort, category: current_category, difficulty: current_difficulty, search: current_search }) }}">{{ total_pages }}</a>
                     {% endif %}
                 </div>
-            </div>
-        {% endfor %}
+
+                <a class="page-btn next {{ page == total_pages ? 'is-disabled' : '' }}"
+                   href="{{ path('app_recipe_index', {_locale: app.request.locale, p: page < total_pages ? page + 1 : total_pages, ps: page_size, sort: sort, category: current_category, difficulty: current_difficulty, search: current_search }) }}"
+                   aria-disabled="{{ page == total_pages ? 'true' : 'false' }}">Suivant ⟶</a>
+            </nav>
+
+            <p class="page-summary">Page {{ page }} / {{ total_pages }} — {{ total }} résultats</p>
+        {% endif %}
     </div>
 
-    {% if total_pages > 1 %}
-        {# fenêtre de 5 pages : [page-2 … page+2] #}
-        {% set window = 2 %}
-        {% set start = page - window %}
-        {% set end   = page + window %}
-        {% set start = start < 1 ? 1 : start %}
-        {% set end   = end > total_pages ? total_pages : end %}
-
-        <nav class="pagination" role="navigation" aria-label="Pagination">
-            {# Précédent #}
-            <a class="page-btn prev {{ page == 1 ? 'is-disabled' : '' }}"
-               href="{{ path('app_recipe_index', {
-                   _locale: app.request.locale,
-                   p: page > 1 ? page - 1 : 1,
-                   ps: page_size,
-                   sort: sort,
-                   category: current_category,
-                   difficulty: current_difficulty,
-                   search: current_search
-               }) }}"
-               aria-disabled="{{ page == 1 ? 'true' : 'false' }}">⟵ Précédent</a>
-
-            <div class="page-numbers">
-                {# Début + ellipsis #}
-                {% if start > 1 %}
-                    <a class="page" href="{{ path('app_recipe_index', {
-                        _locale: app.request.locale, p: 1, ps: page_size, sort: sort,
-                        category: current_category, difficulty: current_difficulty, search: current_search
-                    }) }}">1</a>
-                    {% if start > 2 %}<span class="dots">…</span>{% endif %}
-                {% endif %}
-
-                {# Fenêtre #}
-                {% for pnum in start..end %}
-                    {% if pnum == page %}
-                        <span class="page current" aria-current="page">{{ pnum }}</span>
-                    {% else %}
-                        <a class="page" href="{{ path('app_recipe_index', {
-                            _locale: app.request.locale, p: pnum, ps: page_size, sort: sort,
-                            category: current_category, difficulty: current_difficulty, search: current_search
-                        }) }}">{{ pnum }}</a>
-                    {% endif %}
-                {% endfor %}
-
-                {# Fin + ellipsis #}
-                {% if end < total_pages %}
-                    {% if end < total_pages - 1 %}<span class="dots">…</span>{% endif %}
-                    <a class="page" href="{{ path('app_recipe_index', {
-                        _locale: app.request.locale, p: total_pages, ps: page_size, sort: sort,
-                        category: current_category, difficulty: current_difficulty, search: current_search
-                    }) }}">{{ total_pages }}</a>
-                {% endif %}
-            </div>
-
-            {# Suivant #}
-            <a class="page-btn next {{ page == total_pages ? 'is-disabled' : '' }}"
-               href="{{ path('app_recipe_index', {
-                   _locale: app.request.locale,
-                   p: page < total_pages ? page + 1 : total_pages,
-                   ps: page_size,
-                   sort: sort,
-                   category: current_category,
-                   difficulty: current_difficulty,
-                   search: current_search
-               }) }}"
-               aria-disabled="{{ page == total_pages ? 'true' : 'false' }}">Suivant ⟶</a>
-        </nav>
-
-        <p class="page-summary">Page {{ page }} / {{ total_pages }} — {{ total }} résultats</p>
-    {% endif %}
-
-</div>
-
-<style>
-.recipe-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.recipe-header h1 {
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    color: #ff9800;
-}
-
-.recipe-filters {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.filter-form .filter-row {
-    display: flex;
-    gap: 15px;
-    align-items: end;
-    flex-wrap: wrap;
-}
-
-.filter-group {
-    flex: 1;
-    min-width: 200px;
-}
-
-.view-tools { margin-left: auto; display:flex; gap:8px; }
-
-.recipes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
-}
-
-.recipe-card {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.recipe-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-}
-
-.recipe-image {
-    height: 200px;
-    position: relative;
-    overflow: hidden;
-}
-
-/* Mode compact */
-.compact .recipe-image { height: 140px; }
-.compact .recipe-content { padding: 14px; }
-.compact .recipe-description { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: unset; }
-.compact .recipe-card { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-.compact .recipes-grid { gap: 18px; }
-
-.recipe-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.recipe-card:hover .recipe-image img {
-    transform: scale(1.05);
-}
-
-.recipe-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #ff9800, #f57c00);
-    font-size: 4em;
-    color: white;
-}
-
-.recipe-badges {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 5px;
-}
-
-.recipe-content {
-    padding: 20px;
-}
-
-.recipe-content h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.3em;
-}
-
-.recipe-content h3 a {
-    color: #333;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.recipe-content h3 a:hover {
-    color: #ff9800;
-}
-
-.recipe-description {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 15px;
-    line-height: 1.4;
-}
-
-.recipe-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 13px;
-}
-
-.recipe-stats {
-    display: flex;
-    gap: 15px;
-    color: #666;
-}
-
-.recipe-rating .stars {
-    color: #ff9800;
-}
-
-.recipe-actions { display:flex; gap:8px; margin: 8px 0 0; }
-.btn { background: linear-gradient(135deg, #ff9800, #f57c00); color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; }
-.btn-secondary { background:#fff; color:#ff9800; border:2px solid #ff9800; }
-.btn-secondary:hover { background:#ff9800; color:#fff; }
-.btn-small { padding:6px 10px; font-size: 13px; }
-
-.recipe-author {
-    color: #999;
-    font-size: 12px;
-    border-top: 1px solid #eee;
-    padding-top: 10px;
-}
-
-.no-recipes {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.empty-state h3 {
-    color: #ff9800;
-    margin-bottom: 15px;
-}
-
-.btn-outline {
-    background: transparent;
-    border: 2px solid #ff9800;
-    color: #ff9800;
-}
-
-.btn-outline:hover {
-    background: #ff9800;
-    color: white;
-}
-
-@media (max-width: 768px) {
-    .recipes-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .filter-row {
-        flex-direction: column;
-    }
-
-    .filter-group {
-        width: 100%;
-    }
-}
-</style>
-
+    {# --- CSS local (déplace-le ensuite dans theme-citrus.css) --- #}
     <style>
-        .pagination{
-            display:flex; align-items:center; justify-content:center; gap:12px;
-            margin:28px 0; flex-wrap:wrap;
-        }
-        .page-numbers{ display:flex; gap:8px; }
+        .filters-form .filter-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px}
+        .filters-form .filter-group{display:flex;align-items:center;gap:8px}
+        .filters-form .search-input{min-width:220px}
 
-        .page-btn, .page-numbers .page{
-            display:inline-flex; align-items:center; justify-content:center;
-            min-width:40px; height:40px; padding:0 14px;
-            border-radius:10px; border:1px solid #ffe3c6; background:#fff;
-            text-decoration:none; color:#1f2937; font-weight:600;
-            box-shadow:0 1px 0 rgba(16,24,40,.06);
-            transition: transform .12s ease, box-shadow .12s ease,
-            background .12s ease, border-color .12s ease;
-        }
-        .page-btn:hover, .page-numbers .page:hover{
-            transform: translateY(-1px);
-            border-color:#ffc78f; background:#fffdf9;
-            box-shadow:0 6px 16px rgba(255,152,0,.12);
-        }
-        .page-numbers .current{
-            background:#fff3e0; border-color:#ff9800; color:#1f2937;
-            font-weight:800; cursor:default;
-            box-shadow: inset 0 1px 0 rgba(255,152,0,.15), 0 6px 14px rgba(255,152,0,.10);
-        }
-        .page-btn.is-disabled, .page-btn[aria-disabled="true"]{
-            opacity:.45; pointer-events:none; cursor:not-allowed;
-        }
-        .dots{ padding:0 6px; color:#9aa3b2; user-select:none; }
-        .page-summary{ text-align:center; margin:4px 0 0; color:#6b7280; font-size:.9rem; }
+        .recipes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:25px}
+        .recipe-card{background:#fff;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.1);transition:.3s cubic-bezier(.4,0,.2,1)}
+        .recipe-card:hover{transform:translateY(-8px);box-shadow:0 12px 30px rgba(0,0,0,.15)}
+        .recipe-image{height:200px;position:relative;overflow:hidden}
+        .recipe-image img{width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+        .recipe-card:hover .recipe-image img{transform:scale(1.05)}
+        .recipe-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,#ff9800,#f57c00);font-size:4em;color:#fff}
+        .recipe-badges{position:absolute;top:10px;right:10px;display:flex;gap:5px}
 
-        @media (max-width:560px){
-            .page-btn{ min-width:36px; height:36px; padding:0 10px }
+        .recipe-content{padding:20px}
+        .recipe-description{color:#666;font-size:14px;margin-bottom:15px;line-height:1.4}
+
+        /* —— meta compacte + étoiles qui ne cassent pas —— */
+        .rc-meta{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px;font-size:13px}
+        .rc-stats{display:flex;gap:15px;color:#666;flex-wrap:wrap}
+        .rc-item{display:flex;align-items:center;gap:6px;white-space:nowrap}
+        .rc-stars{display:inline-flex;gap:2px;white-space:nowrap;line-height:1;vertical-align:middle;font-size:14px;color:#ff9800}
+        .rc-stars .off{opacity:.35}
+        .no-rating{color:#6b7280;white-space:nowrap}
+
+        .recipe-actions{display:flex;gap:8px;margin-top:8px}
+        .btn{background:linear-gradient(135deg,#ff9800,#f57c00);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none}
+        .btn-secondary{background:#fff;color:#ff9800;border:2px solid #ff9800}
+        .btn-secondary:hover{background:#ff9800;color:#fff}
+        .btn-small{padding:6px 10px;font-size:13px}
+
+        @media (max-width:768px){
+            .recipes-grid{grid-template-columns:1fr}
+            .filter-row{flex-direction:column}
+            .filter-group{width:100%}
         }
+
+        /* pagination (inchangé) */
+        .pagination{display:flex;align-items:center;justify-content:center;gap:12px;margin:28px 0;flex-wrap:wrap}
+        .page-numbers{display:flex;gap:8px}
+        .page-btn,.page-numbers .page{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 14px;border-radius:10px;border:1px solid #ffe3c6;background:#fff;text-decoration:none;color:#1f2937;font-weight:600;box-shadow:0 1px 0 rgba(16,24,40,.06);transition:transform .12s,box-shadow .12s,background .12s,border-color .12s}
+        .page-btn:hover,.page-numbers .page:hover{transform:translateY(-1px);border-color:#ffc78f;background:#fffdf9;box-shadow:0 6px 16px rgba(255,152,0,.12)}
+        .page-numbers .current{background:#fff3e0;border-color:#ff9800;color:#1f2937;font-weight:800;cursor:default;box-shadow:inset 0 1px 0 rgba(255,152,0,.15),0 6px 14px rgba(255,152,0,.10)}
+        .page-btn.is-disabled,[aria-disabled="true"]{opacity:.45;pointer-events:none}
+        .dots{padding:0 6px;color:#9aa3b2;user-select:none}
+        .page-summary{text-align:center;margin:4px 0 0;color:#6b7280;font-size:.9rem}
     </style>
 
+    {# JS compacte densité (optionnel — safe si le bouton n’existe pas) #}
     <script>
-  (function(){
-    const container = document.currentScript.closest('.container');
-    const densityBtn = container.querySelector('#densityToggle');
-    densityBtn?.addEventListener('click', () => {
-      const pressed = densityBtn.getAttribute('aria-pressed') === 'true';
-      const next = !pressed;
-      densityBtn.setAttribute('aria-pressed', String(next));
-      densityBtn.textContent = next ? 'Mode confortable' : 'Mode compact';
-      container.classList.toggle('compact', next);
-    });
-  })();
-  </script>
+        (function(){
+            const container = document.currentScript.closest('.container');
+            const densityBtn = container.querySelector('#densityToggle');
+            densityBtn?.addEventListener('click', () => {
+                const pressed = densityBtn.getAttribute('aria-pressed') === 'true';
+                const next = !pressed;
+                densityBtn.setAttribute('aria-pressed', String(next));
+                densityBtn.textContent = next ? 'Mode confortable' : 'Mode compact';
+                container.classList.toggle('compact', next);
+            });
+        })();
+    </script>
 {% endblock %}

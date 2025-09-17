@@ -72,9 +72,10 @@
                                 {% endif %}
                             </td>
                             <td class="row-actions">
-                                <a class="btn btn-small" href="{{ path('app_inventory_show', {id: item.id}) }}">👀 Voir</a>
-                                <a class="btn btn-secondary btn-small" href="{{ path('app_inventory_edit', {id: item.id}) }}">✏️ Modifier</a>
+                                <a class="oc-btn oc-btn-secondary oc-btn-sm" href="{{ path('app_inventory_show', {id: item.id}) }}">👀 Voir</a>
+                                <a class="oc-btn oc-btn-primary  oc-btn-sm" href="{{ path('app_inventory_edit', {id: item.id}) }}">✏️ Modifier</a>
                             </td>
+
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -92,7 +93,7 @@
                         <div class="recipe-card mini">
                             <div class="recipe-content">
                                 <h3>{{ recipe.title ?? ('Recette #' ~ recipe.id) }}</h3>
-                                <a class="btn btn-secondary btn-small" href="{{ path('app_recipe_show', {id: recipe.id}) }}">Voir</a>
+                                <a class="oc-btn oc-btn-primary oc-btn-sm" href="{{ path('app_recipe_show', {id: recipe.id}) }}">Voir</a>
                             </div>
                         </div>
                     {% endfor %}
