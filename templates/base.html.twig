@@ -33,9 +33,11 @@
     {% endblock %}
 
     {% block meta %}{% endblock %}
+
 </head>
 
-<body>
+
+<body data-help-kb-url="{{ path('app_contact', {'_locale': app.request.locale}) }}">
 <header class="main-header">
     <div class="header-container">
         <div class="logo-section">
@@ -89,7 +91,7 @@
     </div>
 </header>
 
-{# === NAV : bouton qui ouvre un panneau (dropdown global) === #}
+{# - NAV : bouton qui ouvre un panneau (dropdown global) -#}
 <nav class="main-nav">
     <div class="nav-container">
         <button id="ocMenuToggle" class="btn btn-light" aria-expanded="false" aria-controls="ocMenuPanel">
@@ -207,17 +209,7 @@
     </div>
 </footer>
 
-{# Petites variables JS #}
-
-<script>
-    <body data-help-kb-url="{{ path('app_contact', {'_locale': app.request.locale}) }}">
-
-</script>
-
-
 {% include '_partials/help_widget.html.twig' %}
-
-
 
 </body>
 </html>
