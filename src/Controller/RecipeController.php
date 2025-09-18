@@ -26,6 +26,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+
 
 #[Route('/recettes')]
 final class RecipeController extends AbstractController
@@ -87,6 +90,7 @@ final class RecipeController extends AbstractController
             'total_pages'        => (int) ceil(max(1, $total) / $pageSize),
         ]);
     }
+
 
     /** Création d’une recette (image optionnelle) */
     #[Route('/nouvelle', name: 'app_recipe_new', methods: ['GET','POST'])]

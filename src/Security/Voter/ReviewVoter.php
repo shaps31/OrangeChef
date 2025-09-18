@@ -6,10 +6,12 @@ use App\Entity\Review;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
+
 /**
  * Qui peut faire quoi sur une Review ?
  * - EDIT / DELETE : l'auteur de l'avis ou un admin
  * - APPROVE       : uniquement admin
+ * @param \Symfony\Component\Security\Core\Authorization\Voter\Vote|null $vote
  */
 final class ReviewVoter extends Voter
 {

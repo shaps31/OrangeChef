@@ -4,15 +4,16 @@
 <script>
     window.OC_ROUTE_MAP = {
         'route:app_recipe_index': '{{ path("app_recipe_index", {"_locale": app.request.locale}) }}',
-        'route:app_recipe_new': '{{ path("app_recipe_new", {"_locale": app.request.locale}) }}',
-        'route:app_my_recipes': '{{ path("app_my_recipes", {"_locale": app.request.locale}) }}',
-        'route:app_inventory_index': '{{ path("app_inventory_index", {"_locale": app.request.locale}) }}',
-        'route:app_inventory_new': '{{ path("app_inventory_new", {"_locale": app.request.locale}) }}',
+        'route:app_recipe_new':   '{{ path("app_recipe_new",   {"_locale": app.request.locale}) }}',
+        'route:app_my_recipes':   '{{ path("app_my_recipes",   {"_locale": app.request.locale}) }}',
+        'route:app_favorites':    '{{ path("app_favorites",    {"_locale": app.request.locale}) }}',
+        'route:app_inventory_index':  '{{ path("app_inventory_index",  {"_locale": app.request.locale}) }}',
+        'route:app_inventory_new':    '{{ path("app_inventory_new",    {"_locale": app.request.locale}) }}',
         'route:app_inventory_alerts': '{{ path("app_inventory_alerts", {"_locale": app.request.locale}) }}',
-        'route:app_profil': '{{ path("app_profil", {"_locale": app.request.locale}) }}',
-        'route:app_change_password': '{{ path("app_change_password", {"_locale": app.request.locale}) }}',
-        'route:app_dashboard': '{{ path("app_dashboard", {"_locale": app.request.locale}) }}',
-        'route:app_contact': '{{ path("app_contact", {"_locale": app.request.locale}) }}'
+        'route:app_profil':           '{{ path("app_profil",           {"_locale": app.request.locale}) }}',
+        'route:app_change_password':  '{{ path("app_change_password",  {"_locale": app.request.locale}) }}',
+        'route:app_dashboard':        '{{ path("app_dashboard",        {"_locale": app.request.locale}) }}',
+        'route:app_contact':          '{{ path("app_contact",          {"_locale": app.request.locale}) }}'
     };
 </script>
 
@@ -63,6 +64,31 @@
     @media (max-width:480px){ .oc-help-panel{ right:10px; left:10px; width:auto; bottom:10px; max-height:calc(100vh - 20px); } }
     @media (max-width:420px){ .oc-help-panel{ inset:10px; width:auto; bottom:auto; } }
     @media (prefers-reduced-motion:no-preference){ .oc-help-panel[data-animate="in"]{ animation: ocPop .16s ease-out both; } @keyframes ocPop{ from{ transform:translateY(6px) scale(.98); opacity:.0 } to{ transform:none; opacity:1 } } }
+    /* --- FIX scroll widget --- */
+
+    /* le panneau reste en colonne, pas de scroll global ici */
+    .oc-help-panel{
+        /* existant… */
+    }
+
+    /* le corps prend la place dispo entre header et footer,
+       et laisse la barre de scroll à la liste */
+    .oc-help-body{
+        padding:12px;
+        display:flex;
+        gap:10px;
+        flex-direction:column;
+        flex: 1 1 auto;     /* au lieu de height:100% */
+        overflow: hidden;   /* on bloque le scroll ici */
+    }
+
+    /* c’est la liste qui scrolle */
+    .oc-help-list{
+        flex: 1 1 auto;
+        overflow: auto;
+        overscroll-behavior: contain;
+    }
+
 </style>
 
 <button id="ocHelpBtn" class="oc-help-btn" aria-label="Ouvrir l’aide" aria-controls="ocHelpPanel" aria-expanded="false" type="button">❓</button>
@@ -93,9 +119,11 @@
 
     <div class="oc-help-footer">
         <a class="oc-help-link" href="{{ path('app_recipe_index') }}">🍊 Recettes</a>
-        <a class="oc-help-link" href="{{ path('app_my_recipes') }}">📝 Ma recette</a>
+        <a class="oc-help-link" href="{{ path('app_my_recipes') }}">📝 Mes recettes</a>
+        <a class="oc-help-link" href="{{ path('app_favorites') }}">⭐ Favoris</a>
         <a class="oc-help-link" href="{{ path('app_contact') }}">✉️ Contact</a>
     </div>
+
 </div>
 
 <script>

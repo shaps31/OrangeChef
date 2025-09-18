@@ -5,9 +5,9 @@ namespace App\Entity;
 use App\Repository\FavoriteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: FavoriteRepository::class)]
-#[ORM\Table(name: 'favorite',uniqueConstraints :
-    [new ORM\UniqueConstraint(name: 'uniq_fav_user_recipe',columns: ['user_id','recipe_id'])])]
+#[ORM\Entity]
+#[ORM\Table(name: 'favorite')]
+#[ORM\UniqueConstraint(name: 'uniq_fav_user_recipe', columns: ['user_id', 'recipe_id'])]
 class Favorite
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]

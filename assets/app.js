@@ -146,8 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initProfilePreview();
     initHeaderMenuToggle();
 });
-
-// Inventaire: filtres "Toutes / OK / Bientôt périmées / Périmées"
+// Inventaire : filtres par onglets
 document.addEventListener('DOMContentLoaded', () => {
     const root = document.querySelector('[data-inventory]');
     if (!root) return;
@@ -155,12 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabs = root.querySelectorAll('.tab');
     const rows = root.querySelectorAll('tbody tr');
 
-    function apply(filter) {
+    const apply = (filter) => {
         rows.forEach(r => {
             const st = r.getAttribute('data-status');
             r.style.display = (filter === 'all' || filter === st) ? '' : 'none';
         });
-    }
+    };
 
     tabs.forEach(btn => btn.addEventListener('click', () => {
         tabs.forEach(b => b.classList.remove('is-active'));
@@ -168,3 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
         apply(btn.dataset.filter);
     }));
 });
+
+
+window.HELP_KB_URL = window.HELP_KB_URL || document.body?.dataset?.helpKbUrl || '';

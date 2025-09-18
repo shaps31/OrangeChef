@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
 
-    {# --- SEO / Open Graph --- #}
+    {#  SEO / Open Graph  #}
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Orange Chef">
     <meta property="og:title" content="{% block og_title %}{{ block('title') }}{% endblock %}">
@@ -95,71 +95,84 @@
 <nav class="main-nav">
     <div class="nav-container">
         <button id="ocMenuToggle" class="btn btn-light" aria-expanded="false" aria-controls="ocMenuPanel">
-            <span style="margin-right:.25rem">🍊</span> Menu
+            <span style="margin-right:.25rem">🍊</span> {{ 'nav.menu_button'|trans }}
             <span class="chev" aria-hidden="true" style="margin-left:.4rem">▾</span>
         </button>
-
     </div>
 
     <div id="ocMenuPanel" class="menu-panel" hidden>
         <div class="menu-grid">
 
             <section class="menu-group">
-                <h3>Parcourir</h3>
+                <h3>{{ 'nav.browse'|trans }}</h3>
                 <div class="links">
                     {% set route = app.request.attributes.get('_route') %}
                     <a href="{{ path('app_home', {'_locale': app.request.locale}) }}"
-                       class="{{ route == 'app_home' ? 'is-active' : '' }}">🏡 Accueil</a>
+                       class="{{ route == 'app_home' ? 'is-active' : '' }}">{{ 'nav.home'|trans }}</a>
 
                     <a href="{{ path('app_recipe_index') }}"
-                       class="{{ route starts with 'app_recipe_' ? 'is-active' : '' }}">🍊 Recettes</a>
+                       class="{{ route starts with 'app_recipe_' ? 'is-active' : '' }}">{{ 'nav.recipes'|trans }}</a>
 
                     <a href="{{ path('app_contact') }}"
-                       class="{{ route == 'app_contact' ? 'is-active' : '' }}">✉️ Contact</a>
+                       class="{{ route == 'app_contact' ? 'is-active' : '' }}">{{ 'nav.contact'|trans }}</a>
+
                 </div>
             </section>
 
             <section class="menu-group">
-                <h3>Mon espace</h3>
+                <h3>{{ 'nav.my_space'|trans }}</h3>
                 {% if not app.user %}
                     <div class="links">
-                        <a href="{{ path('app_login', {'_locale': app.request.locale}) }}">🔐 Connexion</a>
-                        <a href="{{ path('app_register', {'_locale': app.request.locale}) }}">📝 Inscription</a>
+                        <a href="{{ path('app_login', {'_locale': app.request.locale}) }}">🔐 {{ 'login'|trans }}</a>
+                        <a href="{{ path('app_register', {'_locale': app.request.locale}) }}">📝 {{ 'register'|trans }}</a>
                     </div>
                 {% else %}
                     <div class="links">
-                        <a href="{{ path('app_dashboard') }}">📊 Dashboard</a>
-                        <a href="{{ path('app_my_recipes') }}">📝 Mes Recettes</a>
-                        <a href="{{ path('app_favorites', {'_locale': app.request.locale}) }}">❤️ Favoris</a>
-                        <a href="{{ path('app_inventory_index') }}">📦 Mon Stock</a>
-                        <a href="{{ path('app_profil') }}">👤 Mon Profil</a>
-                        <a href="{{ path('app_logout', {'_locale': app.request.locale}) }}">🚪 Déconnexion</a>
+                        <a href="{{ path('app_dashboard') }}">{{ 'nav.dashboard'|trans }}</a>
+                        <a href="{{ path('app_my_recipes') }}">{{ 'nav.my_recipes'|trans }}</a>
+                        <a href="{{ path('app_favorites', {'_locale': app.request.locale}) }}">{{ 'nav.favorites'|trans }}</a>
+                        <a href="{{ path('app_inventory_index') }}">{{ 'nav.inventory'|trans }}</a>
+                        <a href="{{ path('app_profil') }}">{{ 'nav.profile'|trans }}</a>
+                        <a href="{{ path('app_logout', {'_locale': app.request.locale}) }}">{{ 'nav.logout'|trans }}</a>
                     </div>
                 {% endif %}
+
             </section>
 
             {% if is_granted('ROLE_ADMIN') %}
                 <section class="menu-group">
-                    <h3>Administration</h3>
+                    <h3>{{ 'nav.admin'|trans }}</h3>
                     <div class="links">
-                        <a href="{{ path('app_user_index') }}">👥 Utilisateurs</a>
+                        <a href="{{ path('app_user_index') }}">{{ 'nav.admin_users'|trans }}</a>
                         <a href="{{ path('app_admin_reviews') }}">
-                            🛡️ Avis
+                            {{ 'nav.admin_reviews'|trans }}
                             {% set pending = pending_reviews() %}
                             {% if pending > 0 %}<span class="chip">{{ pending }}</span>{% endif %}
                         </a>
                     </div>
+
                 </section>
             {% endif %}
 
             <section class="menu-group search">
-                <h3>Recherche</h3>
-                <form action="{{ path('app_recipe_index', {'_locale': app.request.locale}) }}" method="get" class="search-form">
-                    <input type="text" name="q" value="{{ app.request.query.get('q') }}"
-                           placeholder="Rechercher une recette, une catégorie…">
+                <h3>{{ 'nav.search'|trans }}</h3>
+                <form action="{{ path('app_recipe_index', {'_locale': app.request.locale}) }}"
+                      method="get"
+                      class="search-form"
+                      data-suggest-host> {# host relatif pour le dropdown #}
+
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ app.request.query.get('q') }}"
+                        placeholder="{{ 'nav.search_placeholder'|trans }}"
+                        autocomplete="off"
+                        data-suggest-url="{{ path('app_search_suggest', {'_locale': app.request.locale}) }}"
+                    >
                     <button type="submit">🔍</button>
                 </form>
             </section>
+
 
         </div>
     </div>
@@ -208,6 +221,119 @@
         </div>
     </div>
 </footer>
+
+{#Style Barre de Recherche#}
+<style>
+    .oc-suggest{position:absolute;top:100%;left:0;width:min(360px,92vw);background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.12);margin-top:6px;z-index:9999;overflow:auto;max-height:300px}
+    .oc-suggest ul{list-style:none;margin:0;padding:6px}
+    .oc-suggest li{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer}
+    .oc-suggest li[aria-selected="true"],.oc-suggest li:hover{background:#fff7ed}
+    .oc-suggest .type{font-size:12px;color:#9ca3af;margin-left:auto}
+    .oc-suggest-host{position:relative} /* helper pour positionner le panneau */
+</style>
+
+<script>
+    (() => {
+        const debounce = (fn, ms=180) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms);} };
+
+        function initSuggest(input){
+            if (input.dataset.suggestReady) return; // idempotent
+            input.dataset.suggestReady = '1';
+
+            // Conteneur pour positionner le dropdown correctement
+            let host = input.parentElement;
+            if (!host) return;
+            if (!host.classList.contains('oc-suggest-host')) {
+                host.classList.add('oc-suggest-host');
+                host.style.position = host.style.position || 'relative';
+            }
+
+            const url = input.dataset.suggestUrl;
+            let panel, items = [], active = -1;
+
+            function ensurePanel(){
+                if (panel) return panel;
+                panel = document.createElement('div');
+                panel.className = 'oc-suggest';
+                panel.hidden = true;
+                panel.innerHTML = '<ul></ul>';
+                host.appendChild(panel);
+                return panel;
+            }
+            function show(){ ensurePanel(); panel.hidden = false; }
+            function hide(){ if(panel){ panel.hidden = true; active = -1; } }
+            function hasPanel(){ return panel && !panel.hidden; }
+
+            function norm(json){
+                const arr = Array.isArray(json) ? json : (Array.isArray(json.items) ? json.items : []);
+                return arr.map(x => {
+                    if (typeof x === 'string') return {label:x, type:'text', url:null};
+                    return {label: x.label ?? '', type: x.type ?? 'text', url: x.url ?? null};
+                }).filter(o => o.label);
+            }
+
+            function render(){
+                ensurePanel();
+                const ul = panel.querySelector('ul');
+                if (!items.length){ ul.innerHTML=''; hide(); return; }
+                ul.innerHTML = items.map((it,i)=>`
+        <li role="option" data-idx="${i}" aria-selected="${i===active?'true':'false'}">
+          <span>${(it.label||'').replace(/</g,'&lt;')}</span>
+          ${it.type ? `<span class="type">${it.type}</span>` : ''}
+        </li>
+      `).join('');
+                ul.querySelectorAll('li').forEach(li=>{
+                    li.addEventListener('mousedown', (e)=>{ e.preventDefault(); choose(Number(li.dataset.idx)); });
+                });
+                show();
+            }
+
+            function choose(idx){
+                const it = items[idx]; if(!it) return;
+                if (it.url) { window.location.assign(it.url); }
+                else { input.value = it.label; hide(); }
+            }
+
+            function move(dir){
+                if(!items.length) return;
+                active = (active + dir + items.length) % items.length;
+                render();
+            }
+
+            const fetchIt = debounce(async ()=>{
+                const q = input.value.trim();
+                if (q.length < 2){ items=[]; render(); return; }
+                try{
+                    const res = await fetch(`${url}?q=${encodeURIComponent(q)}`, { headers:{'Accept':'application/json'} });
+                    if (!res.ok){ items=[]; render(); return; }
+                    items = norm(await res.json()).slice(0,10);
+                    active = items.length ? 0 : -1;
+                    render();
+                }catch{ items=[]; render(); }
+            }, 200);
+
+            input.addEventListener('input', fetchIt);
+            input.addEventListener('focus', ()=>{ if(items.length) show(); });
+            input.addEventListener('blur', ()=> setTimeout(hide, 100));
+            input.addEventListener('keydown', (e)=>{
+                if (!hasPanel()) return;
+                if (e.key==='ArrowDown'){ e.preventDefault(); move(+1); }
+                else if (e.key==='ArrowUp'){ e.preventDefault(); move(-1); }
+                else if (e.key==='Enter'){ if(active>=0){ e.preventDefault(); choose(active); } }
+                else if (e.key==='Escape'){ hide(); }
+            });
+
+            document.addEventListener('mousedown', (e)=>{ if (!host.contains(e.target)) hide(); });
+        }
+
+        // auto-init sur toute la page (filtres + nav)
+        document.querySelectorAll('input[data-suggest-url]').forEach(initSuggest);
+
+        // si le markup est chargé dynamiquement, expose initSuggest globalement :
+        window.OC_INIT_SUGGEST = initSuggest;
+    })();
+</script>
+
 
 {% include '_partials/help_widget.html.twig' %}
 

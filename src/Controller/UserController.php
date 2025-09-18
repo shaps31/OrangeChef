@@ -20,15 +20,15 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 final class UserController extends AbstractController
 {
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    public function index(UserRepository $users): Response
     {
         return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findBy([], ['id' => 'DESC']), // 🆕 tri du plus récent au plus ancien
+            'users' => $users->findBy([], ['id' => 'DESC']),
         ]);
     }
 
-    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager,UserPasswordHasherInterface $hasher): Response
+    #[Route('/new', name: 'new', methods: ['GET','POST'])]
+    public function new(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -37,16 +37,16 @@ final class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->has('plainPassword')) {
                 $plain = (string) $form->get('plainPassword')->getData();
-                $user->setPassword($hasher->hashPassword($user, $plain));
+                if ($plain !== '') {
+                    $user->setPassword($hasher->hashPassword($user, $plain));
+                }
             }
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $em->persist($user);
+            $em->flush();
 
             $this->addFlash('success', '✅ Utilisateur créé avec succès.');
             return $this->redirectToRoute('app_user_index', ['_locale' => $request->getLocale()]);
         }
-
-
 
         return $this->render('user/new.html.twig', [
             'user' => $user,
@@ -54,50 +54,50 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    #[Route('/{id<\d+>}', name: 'show', methods: ['GET'])]
     public function show(User $user): Response
     {
-        return $this->render('user/show.html.twig', [
-            'user' => $user,
-        ]);
+        return $this->render('user/show.html.twig', ['user' => $user]);
     }
 
-    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    #[Route('/{id<\d+>}/edit', name: 'edit', methods: ['GET','POST'])]
+    public function edit(Request $request, User $user, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): Response
     {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            $this->addFlash('success', '✅ Utilisateur mis à jour avec succès.'); // 🆕 flash message
-
-            return $this->redirectToRoute('app_user_index', ['_locale' => $request->getLocale()], Response::HTTP_SEE_OTHER);
+            if ($form->has('plainPassword')) {
+                $plain = (string) $form->get('plainPassword')->getData();
+                if ($plain !== '') {
+                    $user->setPassword($hasher->hashPassword($user, $plain));
+                }
+            }
+            $em->flush();
+            $this->addFlash('success', '✅ Utilisateur mis à jour avec succès.');
+            return $this->redirectToRoute('app_user_index', ['_locale' => $request->getLocale()]);
         }
 
         return $this->render('user/edit.html.twig', [
             'user' => $user,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/{id}', name: 'delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    #[Route('/{id<\d+>}', name: 'delete', methods: ['POST'])]
+    public function delete(Request $request, User $user, EntityManagerInterface $em): Response
     {
-        // 🛡️ Empêcher la suppression de soi-même
         if ($this->getUser() === $user) {
             $this->addFlash('error', '❌ Vous ne pouvez pas supprimer votre propre compte.');
             return $this->redirectToRoute('app_user_index', ['_locale' => $request->getLocale()]);
         }
 
-        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($user);
-            $entityManager->flush();
-
-            $this->addFlash('success', '🗑️ Utilisateur supprimé avec succès.'); // 🆕 flash message
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->getString('_token'))) {
+            $em->remove($user);
+            $em->flush();
+            $this->addFlash('success', '🗑️ Utilisateur supprimé avec succès.');
         }
 
-        return $this->redirectToRoute('app_user_index', ['_locale' => $request->getLocale()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_user_index', ['_locale' => $request->getLocale()]);
     }
 }

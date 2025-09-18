@@ -1,18 +1,44 @@
 {# templates/recipe/index.html.twig #}
 {% extends 'base.html.twig' %}
 {% set hide_global_search = true %}
+{% trans_default_domain 'messages' %}
 
 {% block title %}🍊 Recettes Orange Chef{% endblock %}
 
 {% block body %}
     <div class="container" data-recipes-root>
-        <div class="recipe-header">
-            <h1>🍊 Toutes nos Recettes</h1>
-            <p>Découvrez des recettes délicieuses à base d'oranges !</p>
+        <div class="oc-hero">
+            <div class="oc-hero__left">
+                <h1 class="oc-hero__title">{{ 'recipes.title'|trans }}</h1>
+                <p class="oc-hero__tagline">{{ 'recipes.tagline'|trans }}</p>
 
-            {% if app.user %}
-                <a href="{{ path('app_recipe_new') }}" class="btn btn-primary">➕ Créer une recette</a>
-            {% endif %}
+                <ul class="oc-hero__list">
+                    <li>🍰 Gâteau moelleux à l’orange</li>
+                    <li>🍹 Jus d’orange maison</li>
+                    <li>🥗 Salade vitaminée à l’orange</li>
+                    <li>🍗 Poulet sauce orange</li>
+                </ul>
+            </div>
+
+            <div class="oc-hero__right">
+                {% if app.user %}
+                    <a href="{{ path('app_recipe_new', {'_locale': app.request.locale}) }}" class="oc-cta">
+                        <div class="oc-cta__icon"></div>
+                        <div>
+                            {{ 'recipes.create'|trans }}
+                            <small>{{ 'recipes.create_hint'|trans }}</small>
+                        </div>
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_login', {'_locale': app.request.locale}) }}" class="oc-cta oc-cta--ghost">
+                        <div class="oc-cta__icon">🔐</div>
+                        <div>
+                            {{ 'auth.login'|trans }}
+                            <small>{{ 'auth.login_hint'|trans }}</small>
+                        </div>
+                    </a>
+                {% endif %}
+            </div>
         </div>
 
         {# --- Filtres --- #}
@@ -40,15 +66,18 @@
             {% else %}
                 <div class="no-recipes">
                     <div class="empty-state">
-                        <h3>🍊 Aucune recette trouvée</h3>
-                        <p>Soyez le premier à partager une délicieuse recette à l'orange !</p>
+                        <h3>{{ 'empty.recipes.title'|trans }}</h3>
+                        <p>{{ 'empty.recipes.subtitle'|trans }}</p>
                         {% if app.user %}
-                            <a href="{{ path('app_recipe_new') }}" class="btn btn-primary">Créer ma première recette</a>
+                            <a href="{{ path('app_recipe_new', {'_locale': app.request.locale}) }}" class="btn btn-primary">
+                                {{ 'recipes.create_first'|trans }}
+                            </a>
                         {% endif %}
                     </div>
                 </div>
             {% endfor %}
         </div>
+
         {# --- Pagination --- #}
         {% include '_partials/pagination.html.twig' with {
             route: 'app_recipe_index',
@@ -65,30 +94,27 @@
                 search: current_search
             }
         } only %}
+    </div>
 
-
-
-        {# JS densité compact (idempotent) #}
+    {# JS densité compact (mémorise la préférence) #}
     <script>
         (() => {
-            const script = document.currentScript;
-            const container =
-                (script && script.closest('[data-recipes-root]')) ||
-                document.querySelector('[data-recipes-root]') ||
-                document.querySelector('.container');
-            if (!container) return;
+            const root = document.querySelector('[data-recipes-root]');
+            const btn  = document.getElementById('densityToggle');
+            if (!root || !btn) return;
 
-            const densityBtn =
-                container.querySelector('#densityToggle') ||
-                document.getElementById('densityToggle');
-            if (!densityBtn) return;
+            const savedCompact = localStorage.getItem('recipes_density') === 'compact';
+            root.classList.toggle('compact', savedCompact);
+            if (savedCompact) {
+                btn.setAttribute('aria-pressed','true');
+                btn.textContent = 'Mode confortable';
+            }
 
-            densityBtn.addEventListener('click', () => {
-                const pressed = densityBtn.getAttribute('aria-pressed') === 'true';
-                const next = !pressed;
-                densityBtn.setAttribute('aria-pressed', String(next));
-                densityBtn.textContent = next ? 'Mode confortable' : 'Mode compact';
-                container.classList.toggle('compact', next);
+            btn.addEventListener('click', () => {
+                const isOn = root.classList.toggle('compact');
+                btn.setAttribute('aria-pressed', String(isOn));
+                btn.textContent = isOn ? 'Mode confortable' : 'Mode compact';
+                localStorage.setItem('recipes_density', isOn ? 'compact' : 'cozy');
             });
         })();
     </script>

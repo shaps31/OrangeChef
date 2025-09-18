@@ -1,73 +1,126 @@
-home: Accueil
-email_page: Page Email
-target: Cible
-recipes: Recettes
-list_of_oranges: Liste des Oranges
-search_color_placeholder: Chercher une couleur
-users: Utilisateurs
-register_link: Pas encore de compte ?
-create_account: Créer un compte
-login: Se connecter
-success_login: Connexion réussie !
-register: S'inscrire
-success_register: Inscription réussie !
-reset_password: Réinitialiser le mot de passe
-success_reset_password: Mot de passe réinitialisé !
-profile: Mon compte
-edit_profile: Modifier mon profil
-change_password: Modifier mon mot de passe
-email: Email
-name: Nom
-first_name: Prénom
-avatar: Avatar
-roles: Rôles
-user: Utilisateur
-admin: Administrateur
-password: Mot de passe
-confirm_password: Confirmer le mot de passe
-old_password: Ancien mot de passe
-new_password: Nouveau mot de passe
-submit: Envoyer
-remember_me: Se souvenir de moi
-dashboard: Tableau de bord
+# — NAVIGATION (avec emojis comme dans l’UI)
+nav:
+    browse: "Parcourir"
+    home: "🏡 Accueil"
+    recipes: "🍊 Recettes"
+    contact: "✉️ Contact"
+    my_space: "Mon espace"
+    dashboard: "📊 Dashboard"
+    my_recipes: "📝 Mes Recettes"
+    favorites: "❤️ Favoris"
+    inventory: "📦 Mon Stock"
+    profile: "👤 Mon Profil"
+    logout: "🚪 Déconnexion"
+    admin: "Administration"
+    admin_users: "👥 Utilisateurs"
+    admin_reviews: "🛡️ Avis"
+    search: "Recherche"
+    search_placeholder: "Rechercher une recette, une catégorie…"
+    menu_button: "Menu"
+
+# — CLÉS GÉNÉRALES
+home: "Accueil"
+email_page: "Page Email"
+target: "Cible"
+list_of_oranges: "Liste des Oranges"
+users: "Utilisateurs"
+register_link: "Pas encore de compte ?"
+create_account: "Créer un compte"
+login: "Se connecter"
+success_login: "Connexion réussie !"
+register: "S'inscrire"
+success_register: "Inscription réussie !"
+reset_password: "Réinitialiser le mot de passe"
+success_reset_password: "Mot de passe réinitialisé !"
+profile: "Mon compte"
+edit_profile: "Modifier mon profil"
+change_password: "Modifier mon mot de passe"
+email: "Email"
+name: "Nom"
+first_name: "Prénom"
+avatar: "Avatar"
+roles: "Rôles"
+user: "Utilisateur"
+admin: "Administrateur"
+password: "Mot de passe"
+confirm_password: "Confirmer le mot de passe"
+old_password: "Ancien mot de passe"
+new_password: "Nouveau mot de passe"
+submit: "Envoyer"
+remember_me: "Se souvenir de moi"
+dashboard: "Tableau de bord"
+color: "Couleur"
+price: "Prix (€)"
+actions: "Actions"
+view: "Voir"
+edit: "Modifier"
+delete: "Supprimer"
+no_result: "Aucune orange ne correspond à votre recherche."
 
 form:
-    nom: Nom
-    prenom: Prénom
-    email: Email
-    avatar: Avatar
+    nom: "Nom"
+    prenom: "Prénom"
+    email: "Email"
+    avatar: "Avatar"
 
 errors:
-    invalid_image_type: Veuillez télécharger une image valide (JPEG, PNG, GIF)
-    min_width: L'image est trop petite (80px minimum)
-    max_width: L'image est trop large (2000px maximum)
-    min_height: L'image est trop petite (80px minimum)
-    max_height: L'image est trop haute (2000px maximum)
+    invalid_image_type: "Veuillez télécharger une image valide (JPEG, PNG, GIF)"
+    min_width: "L'image est trop petite (80px minimum)"
+    max_width: "L'image est trop large (2000px maximum)"
+    min_height: "L'image est trop petite (80px minimum)"
+    max_height: "L'image est trop haute (2000px maximum)"
 
-role.admin: Administrateur
-role.user: Utilisateur
-
-color: Couleur
-price: Prix (€)
-actions: Actions
-view: Voir
-edit: Modifier
-delete: Supprimer
-no_result: Aucune orange ne correspond à votre recherche.
+role.admin: "Administrateur"
+role.user: "Utilisateur"
 
 orange:
-  list_title: Liste des Oranges
-  add_button: Ajouter une Orange
-  filter:
-    color: Couleur
-    name: Nom
-    price_min: Prix min
-    price_max: Prix max
-    search_button: Rechercher
-    reset_button: Réinitialiser
-    all_colors: -- Toutes --
-  no_result: ❌ Aucune orange ne correspond à votre recherche.
-  name: Nom
-  color: Couleur
-  price: Prix (€)
-  actions: Actions
+    list_title: "Liste des Oranges"
+    add_button: "Ajouter une Orange"
+    filter:
+        color: "Couleur"
+        name: "Nom"
+        price_min: "Prix min"
+        price_max: "Prix max"
+        search_button: "Rechercher"
+        reset_button: "Réinitialiser"
+        all_colors: "-- Toutes --"
+    no_result: "❌ Aucune orange ne correspond à votre recherche."
+    name: "Nom"
+    color: "Couleur"
+    price: "Prix (€)"
+    actions: "Actions"
+
+# — AVIS / FORMULAIRE (labels saisis directement comme IDs)
+"Quelques mots sur la recette…": "Quelques mots sur la recette…"
+"Votre note": "Votre note"
+
+# — RECIPES (héros + filtres + pagination + état vide)
+recipes:
+    title: "🍊 Toutes nos Recettes"
+    tagline: "Découvrez nos idées savoureuses à base d’oranges fraîches !"
+    create: "➕ Créer une recette"
+    create_hint: "Partagez votre création gourmande"
+    create_first: "Créer ma première recette"
+
+auth:
+    login: "Se connecter"
+    login_hint: "Identifiez-vous pour publier"
+
+filters:
+    search_ph: "Rechercher une recette, une catégorie, une variété…"
+    category_all: "Toutes catégories"
+    diff_all: "Toute difficulté"
+    sort:
+        newest: "🆕 Plus récentes"
+        oldest: "🗓️ Plus anciennes"
+        title:  "🔤 Titre (A→Z)"
+    per_page: "{count} / page"
+
+pagination:
+    prev: "⟵ Précédent"
+    next: "Suivant ⟶"
+
+empty:
+    recipes:
+        title: "🍊 Aucune recette trouvée"
+        subtitle: "Soyez le premier à partager une délicieuse recette à l'orange !"

@@ -86,5 +86,33 @@ class RecipeRepository extends ServiceEntityRepository
     {
         return $this->count(['isPublic' => true]); // SELECT COUNT(*) WHERE is_public = 1
     }
+    public function suggestByTitle(string $term, int $limit = 8): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r.id, r.title')
+            ->andWhere('LOWER(r.title) LIKE :q')
+            ->setParameter('q', '%'.mb_strtolower($term).'%')
+            ->andWhere('r.isPublic = :pub')->setParameter('pub', true)
+            ->orderBy('r.views', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function suggestCategories(string $term, int $limit = 5): array
+    {
+        $rows = $this->createQueryBuilder('r')
+            ->select('DISTINCT r.category AS cat')
+            ->andWhere('r.category IS NOT NULL AND r.category <> \'\'')
+            ->andWhere('LOWER(r.category) LIKE :q')
+            ->setParameter('q', '%'.mb_strtolower($term).'%')
+            ->andWhere('r.isPublic = :pub')->setParameter('pub', true)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_values(array_filter(array_map(fn($r) => $r['cat'] ?? null, $rows)));
+    }
+
 
 }

@@ -63,15 +63,22 @@ class ReviewRepository extends ServiceEntityRepository
     /**
      * Compte combien d’AVIS sont EN ATTENTE.
      */
+    // src/Repository/ReviewRepository.php
     public function countPending(): int
     {
-        return (int) $this->createQueryBuilder('r')
-            ->select('COUNT(r.id)')
-            ->where('r.isApproved = :approved')
-            ->setParameter('approved', false)
-            ->getQuery()
-            ->getSingleScalarResult();
+        try {
+            return (int) $this->createQueryBuilder('r')
+                ->select('COUNT(r.id)')
+                ->andWhere('r.isApproved = 0')
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Throwable) {
+
+
+            return 0;
+        }
     }
+
 
     public function countApproved(): int
     {
