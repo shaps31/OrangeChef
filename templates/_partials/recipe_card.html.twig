@@ -1,0 +1,87 @@
+{# templates/_partials/recipe_card.html.twig #}
+{# Props: recipe (required), is_owner=false, compact=false, show_author=true #}
+{% set is_owner   = is_owner   is defined ? is_owner   : false %}
+{% set compact    = compact    is defined ? compact    : false %}
+{% set show_author= show_author is defined ? show_author : true %}
+
+<div class="recipe-card {{ compact ? 'compact' : '' }}">
+    <div class="recipe-image">
+        {% set img = recipe.image %}
+        {% if img %}
+            {% set imgNoSlash = img starts with '/' ? img|slice(1) : img %}
+            {% if imgNoSlash starts with 'uploads/' %}
+                <img loading="lazy" decoding="async" src="{{ asset(imgNoSlash) }}" alt="{{ recipe.title }}">
+            {% else %}
+                <img loading="lazy" decoding="async" src="{{ asset('uploads/recipes/' ~ imgNoSlash) }}" alt="{{ recipe.title }}">
+            {% endif %}
+        {% else %}
+            {# Fallbacks par catégorie puis par mots-clés #}
+            {% set cat = (recipe.category ?? '')|lower %}
+            {% set fallback = null %}
+            {% if 'dessert' in cat %}{% set fallback = 'tarte.jpg' %}
+            {% elseif 'boisson' in cat %}{% set fallback = 'jus.jpg' %}
+            {% elseif 'salade'  in cat %}{% set fallback = 'salade.jpg' %}
+            {% elseif 'plat'    in cat %}{% set fallback = 'poulet.jpg' %}
+            {% endif %}
+            {% if not fallback %}
+                {% set title_lc = (recipe.title ?? '')|lower %}
+                {% if 'tarte' in title_lc %}{% set fallback = 'tarte.jpg' %}
+                {% elseif 'jus' in title_lc %}{% set fallback = 'jus.jpg' %}
+                {% elseif 'salade' in title_lc %}{% set fallback = 'salade.jpg' %}
+                {% elseif 'poulet' in title_lc %}{% set fallback = 'poulet.jpg' %}
+                {% endif %}
+            {% endif %}
+            {% if fallback %}
+                <img loading="lazy" decoding="async" src="{{ asset('uploads/recipes/' ~ fallback) }}" alt="{{ recipe.title }}">
+            {% else %}
+                <div class="recipe-placeholder">🍊</div>
+            {% endif %}
+        {% endif %}
+
+        <div class="recipe-badges">
+            <span class="badge badge-chef">{{ recipe.categoryIcon }}</span>
+            <span class="badge badge-bronze">{{ recipe.difficultyIcon }}</span>
+        </div>
+    </div>
+
+    <div class="recipe-content">
+        <h3><a href="{{ path('app_recipe_show', {id: recipe.id}) }}">{{ recipe.title }}</a></h3>
+
+        {% set desc = recipe.description ?? '' %}
+        <p class="recipe-description">{{ desc|length > 100 ? desc|slice(0, 100) ~ '…' : desc }}</p>
+
+        <div class="recipe-meta rc-meta">
+            <div class="recipe-stats rc-stats">
+                <span>⏱️ {{ recipe.totalTime }}min</span>
+                <span>👥 {{ recipe.servings }} pers.</span>
+                <span>👁️ {{ recipe.views }}</span>
+            </div>
+
+            <div class="recipe-rating rc-item">
+                {% set avg = (recipe.averageRating|default(0))|round(0, 'floor') %}
+                {% if avg > 0 %}
+                    <span class="rc-stars" aria-label="{{ avg }}/5">
+            {% for i in 1..5 %}
+                <span class="{{ i <= avg ? '' : 'off' }}">★</span>
+            {% endfor %}
+          </span>
+                    <small class="muted">({{ recipe.ratings|length }})</small>
+                {% else %}
+                    <span class="no-rating">Pas encore noté</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="recipe-actions">
+            {% if is_owner %}
+                <a class="btn btn-small" href="{{ path('app_recipe_edit', {id: recipe.id}) }}">✏️ Modifier</a>
+            {% endif %}
+            <a class="btn btn-secondary btn-small" href="{{ path('app_recipe_show', {id: recipe.id}) }}">👀 Voir</a>
+        </div>
+
+        {% if show_author %}
+            <div class="recipe-author"><small>Par {{ recipe.author ? recipe.author.displayName : 'Anonyme' }}</small></div>
+        {% endif %}
+
+    </div>
+</div>

@@ -5,7 +5,7 @@
     window.OC_ROUTE_MAP = {
         'route:app_recipe_index': '{{ path("app_recipe_index", {"_locale": app.request.locale}) }}',
         'route:app_recipe_new': '{{ path("app_recipe_new", {"_locale": app.request.locale}) }}',
-        'route:app_my_recipes': '{{ path("app_my_recipes", {"_locale": app.request.locale}) }}'
+        'route:app_my_recipes': '{{ path("app_my_recipes", {"_locale": app.request.locale}) }}',
         'route:app_inventory_index': '{{ path("app_inventory_index", {"_locale": app.request.locale}) }}',
         'route:app_inventory_new': '{{ path("app_inventory_new", {"_locale": app.request.locale}) }}',
         'route:app_inventory_alerts': '{{ path("app_inventory_alerts", {"_locale": app.request.locale}) }}',
@@ -14,9 +14,8 @@
         'route:app_dashboard': '{{ path("app_dashboard", {"_locale": app.request.locale}) }}',
         'route:app_contact': '{{ path("app_contact", {"_locale": app.request.locale}) }}'
     };
-    // Optionnel: expose aussi l'URL du KB si tu externalises le JS
-    window.HELP_KB_URL = '{{ path("help_kb", {"_locale": app.request.locale}) }}';
 </script>
+
 
 <style>
     :root{ --oc-accent:#ff9800; --oc-accent-600:#fb8c00; --oc-bg:#fff; --oc-text:#1f2937; --oc-muted:#6b7280; --oc-chip:#f3f4f6; --oc-chip-active:#ffe0b2; --oc-shadow:0 12px 28px rgba(0,0,0,.25); --oc-ring:0 0 0 3px rgba(255,152,0,.15); }

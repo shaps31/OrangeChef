@@ -1,0 +1,116 @@
+{# Filtres pour la liste de recettes
+   Props attendues (toutes optionnelles, valeurs par défaut gérées ici) :
+   - action_route:      route cible du <form> (ex: 'app_recipe_index')
+   - action_params:     params pour path() (ex: { _locale: app.request.locale })
+   - categories:        array de catégories (sinon on affiche les valeurs par défaut)
+   - current_category:  string|nullable
+   - current_difficulty:string|nullable
+   - sort:              'newest'|'oldest'|'title'
+   - page_size:         int (alias de "ps")
+   - current_search:    string (alias de "q")
+   - show_density_toggle: bool (default true)
+   - show_category:     bool (default true)
+   - show_difficulty:   bool (default true)
+   - show_sort:         bool (default true)
+   - show_per_page:     bool (default true)
+#}
+
+{% set action_route = action_route|default('app_recipe_index') %}
+{% set action_params = action_params|default({ _locale: app.request.locale }) %}
+
+{% set _diff = current_difficulty in ['moyen','moyenne'] ? 'moyenne' : current_difficulty %}
+{% set _qval = current_search ?? app.request.get('q') ?? app.request.get('search') %}
+{% set _per  = page_size ?? app.request.get('ps')|default(12) %}
+
+{% set show_density_toggle = show_density_toggle is defined ? show_density_toggle : true %}
+{% set show_category   = show_category   is defined ? show_category   : true %}
+{% set show_difficulty = show_difficulty is defined ? show_difficulty : true %}
+{% set show_sort       = show_sort       is defined ? show_sort       : true %}
+{% set show_per_page   = show_per_page   is defined ? show_per_page   : true %}
+
+<div class="recipe-filters">
+    <form action="{{ path(action_route, action_params) }}" method="get" class="filters-form">
+        <div class="filter-row">
+            {# reset pagination #}
+            <input type="hidden" name="p" value="1">
+
+            <div class="filter-group">
+                <input type="text"
+                       name="q"
+                       value="{{ _qval }}"
+                       class="form-control search-input"
+                       placeholder="Rechercher une recette, une catégorie, une variété…"
+                       style="max-width:320px">
+            </div>
+
+            {% if show_category %}
+                <div class="filter-group">
+                    <select name="category" class="form-select" onchange="this.form.submit()">
+                        <option value="">Toutes catégories</option>
+                        {% if categories is defined and categories is not empty %}
+                            {% for c in categories %}
+                                <option value="{{ c }}" {{ current_category == c ? 'selected' : '' }}>{{ c|title }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="dessert"   {{ current_category == 'dessert'   ? 'selected' : '' }}>🍰 Dessert</option>
+                            <option value="boisson"   {{ current_category == 'boisson'   ? 'selected' : '' }}>🥤 Boisson</option>
+                            <option value="plat"      {{ current_category == 'plat'      ? 'selected' : '' }}>🍽️ Plat</option>
+                            <option value="sauce"     {{ current_category == 'sauce'     ? 'selected' : '' }}>🥄 Sauce</option>
+                            <option value="confiture" {{ current_category == 'confiture' ? 'selected' : '' }}>🍯 Confiture</option>
+                            <option value="salade"    {{ current_category == 'salade'    ? 'selected' : '' }}>🥗 Salade</option>
+                        {% endif %}
+                    </select>
+                </div>
+            {% endif %}
+
+            {% if show_difficulty %}
+                <div class="filter-group">
+                    <select name="difficulty" class="form-select" onchange="this.form.submit()">
+                        <option value="">Toute difficulté</option>
+                        <option value="facile"     {{ _diff == 'facile'     ? 'selected' : '' }}>⭐ Facile</option>
+                        <option value="moyenne"    {{ _diff == 'moyenne'    ? 'selected' : '' }}>⭐⭐ Moyenne</option>
+                        <option value="difficile"  {{ _diff == 'difficile'  ? 'selected' : '' }}>⭐⭐⭐ Difficile</option>
+                    </select>
+                </div>
+            {% endif %}
+
+            {% if show_sort %}
+                <div class="filter-group">
+                    <select name="sort" class="form-select" onchange="this.form.submit()">
+                        <option value="newest" {{ sort == 'newest' ? 'selected' : '' }}>🆕 Plus récentes</option>
+                        <option value="oldest" {{ sort == 'oldest' ? 'selected' : '' }}>🗓️ Plus anciennes</option>
+                        <option value="title"  {{ sort == 'title'  ? 'selected' : '' }}>🔤 Titre (A→Z)</option>
+                    </select>
+                </div>
+            {% endif %}
+
+            {% if show_per_page %}
+                <div class="filter-group">
+                    <select name="ps" class="form-select" onchange="this.form.submit()">
+                        {% for n in [10,20,50] %}
+                            <option value="{{ n }}" {{ _per == n ? 'selected' : '' }}>{{ n }} / page</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+
+            {% if show_density_toggle %}
+                <button id="densityToggle"
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        aria-pressed="false">
+                    Mode compact
+                </button>
+            {% endif %}
+
+            <div class="filter-group">
+                <button type="submit" class="btn btn-primary">Filtrer</button>
+                <a href="{{ path(action_route, action_params) }}" class="btn btn-outline-secondary">Effacer</a>
+            </div>
+        </div>
+    </form>
+
+    {% if _qval %}
+        <p class="muted mt-2">Résultats pour « <strong>{{ _qval }}</strong> »</p>
+    {% endif %}
+</div>

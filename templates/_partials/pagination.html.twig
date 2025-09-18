@@ -1,0 +1,73 @@
+{# Re-usable pagination
+   Usage minimal :
+   {% include '_partials/pagination.html.twig' with {
+      route: 'app_recipe_index',
+      page: page,
+      total_pages: total_pages,
+      total: total,
+      query: {
+        _locale: app.request.locale,
+        ps: page_size,
+        sort: sort,
+        category: current_category,
+        difficulty: current_difficulty,
+        search: current_search
+      }
+   } only %}
+
+   Props optionnels :
+   - window: int (par défaut 2)
+   - show_summary: bool (par défaut true)
+   - prev_label / next_label : string (labels des boutons)
+#}
+
+{% set window = window is defined ? window : 2 %}
+{% set show_summary = show_summary is defined ? show_summary : true %}
+{% set prev_label = prev_label is defined ? prev_label : '⟵ Précédent' %}
+{% set next_label = next_label is defined ? next_label : 'Suivant ⟶' %}
+
+{% if total_pages is defined and total_pages > 1 %}
+    {% set start = page - window %}
+    {% set end   = page + window %}
+    {% set start = start < 1 ? 1 : start %}
+    {% set end   = end > total_pages ? total_pages : end %}
+
+    <nav class="pagination" role="navigation" aria-label="Pagination">
+        {# Précédent #}
+        <a class="page-btn prev {{ page == 1 ? 'is-disabled' : '' }}"
+           href="{{ path(route, query|merge({ p: page > 1 ? page - 1 : 1 })) }}"
+           aria-disabled="{{ page == 1 ? 'true' : 'false' }}">{{ prev_label }}</a>
+
+        <div class="page-numbers">
+            {# Début + ellipsis #}
+            {% if start > 1 %}
+                <a class="page" href="{{ path(route, query|merge({ p: 1 })) }}">1</a>
+                {% if start > 2 %}<span class="dots">…</span>{% endif %}
+            {% endif %}
+
+            {# Fenêtre #}
+            {% for pnum in start..end %}
+                {% if pnum == page %}
+                    <span class="page current" aria-current="page">{{ pnum }}</span>
+                {% else %}
+                    <a class="page" href="{{ path(route, query|merge({ p: pnum })) }}">{{ pnum }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {# Fin + ellipsis #}
+            {% if end < total_pages %}
+                {% if end < total_pages - 1 %}<span class="dots">…</span>{% endif %}
+                <a class="page" href="{{ path(route, query|merge({ p: total_pages })) }}">{{ total_pages }}</a>
+            {% endif %}
+        </div>
+
+        {# Suivant #}
+        <a class="page-btn next {{ page == total_pages ? 'is-disabled' : '' }}"
+           href="{{ path(route, query|merge({ p: page < total_pages ? page + 1 : total_pages })) }}"
+           aria-disabled="{{ page == total_pages ? 'true' : 'false' }}">{{ next_label }}</a>
+    </nav>
+
+    {% if show_summary %}
+        <p class="page-summary">Page {{ page }} / {{ total_pages }} — {{ total }} résultats</p>
+    {% endif %}
+{% endif %}

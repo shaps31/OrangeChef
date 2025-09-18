@@ -49,10 +49,11 @@
     <script type="application/ld+json">{{ ld|json_encode(constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
 {% endblock %}
 
-{% block body %}
 
-      {% set _ingredients = ingredients|default([]) %}
-      {% set _steps = steps|default([]) %}
+{% block body %}
+    {% set _ingredients = ingredients|default([]) %}
+    {% set _steps = steps|default([]) %}
+
 
 
       <div class="container">

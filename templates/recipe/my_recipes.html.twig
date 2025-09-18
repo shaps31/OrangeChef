@@ -1,122 +1,93 @@
+{# templates/recipe/my_recipes.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Mes recettes{% endblock %}
 
 {% block body %}
-<div class="container">
-  <div class="recipe-header">
-    <h1>📝 Mes Recettes</h1>
-    <p>Gérez vos créations gourmandes à base d'oranges.</p>
-    <a class="btn btn-primary" href="{{ path('app_recipe_new') }}">➕ Nouvelle recette</a>
-  </div>
+    <div class="container oc-recipes-page">
+        <header class="oc-recipes-head">
+            <h1>📝 Mes Recettes</h1>
+            <p>Gérez vos créations gourmandes à base d'oranges.</p>
+            <a class="btn" href="{{ path('app_recipe_new') }}">➕ Nouvelle recette</a>
+        </header>
 
-  <form method="get" class="filter-form" style="margin-bottom:16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <label for="sort" style="font-size:14px; color:#666;">Trier par</label>
-    <select id="sort" name="sort" class="form-control">
-      <option value="newest" {{ sort == 'newest' ? 'selected' : '' }}>🆕 Plus récentes</option>
-      <option value="oldest" {{ sort == 'oldest' ? 'selected' : '' }}>🗓️ Plus anciennes</option>
-      <option value="title" {{ sort == 'title' ? 'selected' : '' }}>🔤 Titre (A→Z)</option>
-    </select>
-    <button type="submit" class="btn btn-secondary">Appliquer</button>
-  </form>
+        <form method="get" class="oc-recipes-filters">
+            <label for="sort">Trier par</label>
+            <select id="sort" name="sort" class="form-select">
+                <option value="newest" {{ sort == 'newest' ? 'selected' : '' }}>🆕 Plus récentes</option>
+                <option value="oldest" {{ sort == 'oldest' ? 'selected' : '' }}>🗓️ Plus anciennes</option>
+                <option value="title"  {{ sort == 'title'  ? 'selected' : '' }}>🔤 Titre (A→Z)</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Appliquer</button>
+        </form>
 
-  {% if recipes is empty %}
-    <div class="no-recipes">
-      <div class="empty-state">
-        <h3>🍊 Aucune recette pour le moment</h3>
-        <p>Commencez en créant votre première recette.</p>
-        <a href="{{ path('app_recipe_new') }}" class="btn btn-primary">Créer une recette</a>
-      </div>
+        {% if recipes is empty %}
+            <section class="oc-empty">
+                <h3>🍊 Aucune recette pour le moment</h3>
+                <p>Commencez en créant votre première recette.</p>
+                <a href="{{ path('app_recipe_new') }}" class="btn">Créer une recette</a>
+            </section>
+        {% else %}
+            <section class="oc-grid">
+                {% for recipe in recipes %}
+                    <article class="oc-card">
+                        <figure class="oc-card__media">
+                            {% if recipe.image %}
+                                {% set img = recipe.image %}
+                                {% if img starts with 'http' or img starts with 'https' %}
+                                    {% set src = img %}
+                                {% elseif img starts with 'uploads/' %}
+                                    {% set src = asset(img) %}
+                                {% else %}
+                                    {% set src = asset('uploads/recipes/' ~ img) %}
+                                {% endif %}
+                                <img src="{{ src }}" alt="{{ recipe.title }}">
+                            {% else %}
+                                <div class="oc-card__placeholder">🍊</div>
+                            {% endif %}
+                            <div class="oc-badges">
+                                <span class="badge">{{ recipe.categoryIcon }}</span>
+                                <span class="badge">{{ recipe.difficultyIcon }}</span>
+                            </div>
+                        </figure>
+
+                        <div class="oc-card__body">
+                            <h3 class="oc-card__title">
+                                <a href="{{ path('app_recipe_show', {id: recipe.id}) }}">{{ recipe.title }}</a>
+                            </h3>
+
+                            {% set desc = recipe.description ?? '' %}
+                            <p class="oc-card__desc">{{ desc }}</p>
+
+                            <div class="oc-card__meta">
+                                <div class="oc-meta__stats">
+                                    <span>⏱️ {{ recipe.totalTime }}min</span>
+                                    <span>👥 {{ recipe.servings }} pers.</span>
+                                    <span>👁️ {{ recipe.views }}</span>
+                                </div>
+                                <div class="oc-meta__actions">
+                                    <a class="btn btn-small" href="{{ path('app_recipe_edit', {id: recipe.id}) }}">✏️ Modifier</a>
+                                    <a class="btn btn-secondary btn-small" href="{{ path('app_recipe_show', {id: recipe.id}) }}">👀 Voir</a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        {% if total_pages is defined and total_pages > 1 %}
+            <nav class="pagination">
+                <a class="page-btn btn-secondary btn-small"
+                   href="{{ path('app_my_recipes', { p: page > 1 ? page - 1 : 1, ps: page_size, sort: sort }) }}"
+                   aria-disabled="{{ page == 1 ? 'true' : 'false' }}">⟵ Précédent</a>
+
+                <span class="page-info">Page {{ page }} / {{ total_pages }} ({{ total }} recettes)</span>
+
+                <a class="page-btn btn-secondary btn-small"
+                   href="{{ path('app_my_recipes', { p: page < total_pages ? page + 1 : total_pages, ps: page_size, sort: sort }) }}"
+                   aria-disabled="{{ page == total_pages ? 'true' : 'false' }}">Suivant ⟶</a>
+            </nav>
+        {% endif %}
     </div>
-  {% else %}
-    <div class="recipes-grid">
-      {% for recipe in recipes %}
-        <div class="recipe-card">
-          <div class="recipe-image">
-            {% if recipe.image %}
-              {% set img = recipe.image %}
-              {% if img starts with 'http' or img starts with 'https' %}
-                {% set src = img %}
-              {% elseif img starts with 'uploads/' %}
-                {% set src = asset(img) %}
-              {% else %}
-                {% set src = asset('uploads/recipes/' ~ img) %}
-              {% endif %}
-              <img src="{{ src }}" alt="{{ recipe.title }}"
-                  style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px;">
-            {% else %}
-              <div class="recipe-placeholder">🍊</div>
-            {% endif %}
-            <div class="recipe-badges">
-              <span class="badge badge-chef">{{ recipe.categoryIcon }}</span>
-              <span class="badge badge-bronze">{{ recipe.difficultyIcon }}</span>
-            </div>
-          </div>
-
-          <div class="recipe-content">
-            <h3><a href="{{ path('app_recipe_show', {id: recipe.id}) }}">{{ recipe.title }}</a></h3>
-            <p class="recipe-description">
-              {% set desc = recipe.description ?? '' %}
-              {{ desc|length > 120 ? desc|slice(0, 120) ~ '…' : desc }}
-            </p>
-
-            <div class="recipe-meta">
-              <div class="recipe-stats">
-                <span>⏱️ {{ recipe.totalTime }}min</span>
-                <span>👥 {{ recipe.servings }} pers.</span>
-                <span>👁️ {{ recipe.views }}</span>
-              </div>
-              <div class="recipe-actions">
-                <a class="btn btn-small" href="{{ path('app_recipe_edit', {id: recipe.id}) }}">✏️ Modifier</a>
-                <a class="btn btn-secondary btn-small" href="{{ path('app_recipe_show', {id: recipe.id}) }}">👀 Voir</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  {% if total_pages is defined and total_pages > 1 %}
-    <nav class="pagination" style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:18px;">
-      <a class="page-btn btn-secondary btn-small" href="{{ path('app_my_recipes', { p: page > 1 ? page - 1 : 1, ps: page_size, sort: sort }) }}" aria-disabled="{{ page == 1 ? 'true' : 'false' }}">⟵ Précédent</a>
-      <span class="page-info">Page {{ page }} / {{ total_pages }} ({{ total }} recettes)</span>
-      <a class="page-btn btn-secondary btn-small" href="{{ path('app_my_recipes', { p: page < total_pages ? page + 1 : total_pages, ps: page_size, sort: sort }) }}" aria-disabled="{{ page == total_pages ? 'true' : 'false' }}">Suivant ⟶</a>
-    </nav>
-  {% endif %}
-</div>
-
-<style>
-.recipe-header { text-align:center; margin-bottom: 30px; }
-.recipe-header h1 { font-size: 2.2em; margin: 0 0 8px; color:#ff9800; }
-.recipes-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
-.recipe-card { background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,.1); transition:.3s ease; position:relative; }
-.recipe-card:hover { transform: translateY(-6px); box-shadow:0 12px 26px rgba(0,0,0,.15); }
-.recipe-image { height: 190px; position:relative; overflow:hidden; }
-.recipe-image img { width:100%; height:100%; object-fit:cover; transition: transform .3s ease; }
-.recipe-card:hover .recipe-image img { transform: scale(1.05); }
-.recipe-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, #ff9800, #f57c00); font-size:3.5em; color:#fff; }
-.recipe-badges { position:absolute; top:10px; right:10px; display:flex; gap:6px; }
-.badge { background:#fff; border-radius:12px; padding:4px 8px; font-size:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); }
-.badge-chef { color:#ff7043; }
-.badge-bronze { color:#ff9800; }
-.recipe-content { padding:16px 18px; }
-.recipe-content h3 { margin:0 0 8px; font-size:1.2em; }
-.recipe-content h3 a { color:#333; text-decoration:none; }
-.recipe-content h3 a:hover { color:#ff9800; }
-.recipe-description { color:#666; font-size:14px; line-height:1.45; margin-bottom:12px; min-height: 42px; }
-.recipe-meta { display:flex; justify-content:space-between; align-items:center; font-size:13px; }
-.recipe-stats { display:flex; gap:12px; color:#666; }
-.recipe-actions { display:flex; gap:8px; }
-.btn { background: linear-gradient(135deg, #ff9800, #f57c00); color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; }
-.btn-secondary { background:#fff; color:#ff9800; border:2px solid #ff9800; }
-.btn-secondary:hover { background:#ff9800; color:#fff; }
-.btn-small { padding:6px 10px; font-size: 13px; }
-.no-recipes { text-align:center; padding:60px 20px; background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
-.empty-state h3 { color:#ff9800; margin-bottom:8px; }
-
-@media (max-width: 768px) {
-  .recipes-grid { grid-template-columns: 1fr; }
-}
-</style>
 {% endblock %}
